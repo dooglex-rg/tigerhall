@@ -17,13 +17,15 @@ func create_tiger(c *fiber.Ctx) error {
 	var p PayloadNewTiger
 	var response ResponseNewTiger
 
+	//parsing payload JSON to struct
+	c.BodyParser(&p)
 	//Validating the payload fields
 	switch {
 	case p.Name == "":
 		response.Status.Message = "name field should not be blank"
 	case p.Dob.IsZero() || p.LastSeen.IsZero():
 		response.Status.Message = "birthday & last_seen fields should not be blank/zero/nil value"
-	case len(p.GeoLocation) == 2:
+	case len(p.GeoLocation) != 2:
 		response.Status.Message = "cordinates field should contain exactly 2 values in the array. ie., [lat,lon]"
 	default:
 		response.Status.Success = true
@@ -42,7 +44,7 @@ func create_tiger(c *fiber.Ctx) error {
 	INSERT INTO 
 		last_seen(seen_time,latitude,longitude,tiger_id) 
 		VALUES( $3, $4, $5, (SELECT id FROM rows) )
-	RETURNING id;`
+	RETURNING tiger_id;`
 
 	row := DB.QueryRow(sql, p.Name, p.Dob, p.LastSeen, p.GeoLocation[0], p.GeoLocation[1])
 

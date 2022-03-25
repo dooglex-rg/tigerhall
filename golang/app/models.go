@@ -19,9 +19,9 @@ type ErrorStatus struct {
 type PayloadNewTiger struct {
 	//Name of the tiger
 	Name string `json:"name"`
-	//Date of birth of the tiger
+	//Date of birth of the tiger. Must be in RFC3339 format.
 	Dob time.Time `json:"birthday"`
-	//Timestamp when the tiger was last seen
+	//Timestamp when the tiger was last seen. Must be in RFC3339 format.
 	LastSeen time.Time `json:"last_seen"`
 	//Last seen cordinate points [lat,lon]
 	GeoLocation [2]float64 `json:"cordinates"`
