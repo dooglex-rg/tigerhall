@@ -1,4 +1,4 @@
-module github.com/sacred-deer-07/tigerhall/golang
+module github.com/dooglex-rg/tigerhall
 
 go 1.17
 

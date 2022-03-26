@@ -54,8 +54,9 @@ func main() {
 //Routing of incoming URLs with its handlers
 func url_router(app *fiber.App) {
 	app.Get("/", index_page)
-	app.Post("/tiger/new", create_tiger)
+	app.Post("/tiger/add", create_tiger)
 	app.Post("/tiger/check", check_tiger)
+	app.Post("/tiger/sighting/add", create_sighting)
 }
 
 //Middlewares configuration

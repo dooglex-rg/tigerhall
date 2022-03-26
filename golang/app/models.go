@@ -21,13 +21,19 @@ type PayloadTigerBio struct {
 	Dob string `json:"birthday" form:"birthday"`
 }
 
+type PayloadSightingInfo struct {
+	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
+	LastSeen string `json:"last_seen" form:"last_seen"`
+	//Last seen Latitude point
+	Latitude float64 `json:"latitude" form:"latitude"`
+	//Last seen Longitude point
+	Longitude float64 `json:"longitude" form:"longitude"`
+}
+
 //Parsing Request payload to add a new tiger
 type PayloadAddNewTiger struct {
 	PayloadTigerBio
-	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
-	LastSeen string `json:"last_seen" form:"last_seen"`
-	//Last seen cordinate points [lat,lon]
-	GeoLocation [2]float64 `json:"cordinates" form:"cordinates"`
+	PayloadSightingInfo
 }
 
 //Outgoing Response format for adding a new tiger

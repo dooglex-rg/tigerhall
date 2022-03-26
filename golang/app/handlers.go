@@ -26,18 +26,11 @@ func create_tiger(c *fiber.Ctx) error {
 	//parsing payload JSON to struct
 	c.BodyParser(&p)
 	//Validating the payload fields
-	switch {
-	case p.Name == "" || p.Dob == "" || p.LastSeen == "":
-		r.Status.Message = "name/birthday/last_seen fields should not be blank/zero/nil value"
-	case len(p.GeoLocation) != 2:
-		r.Status.Message = "cordinates field should contain exactly 2 values in the array. ie., [lat,lon]"
-	default:
-		r.Status.Success = true
-	}
-
-	if !r.Status.Success {
+	if p.Name == "" || p.Dob == "" || p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0 {
+		r.Status.Message = "name/birthday/last_seen/geo fields should not be blank/zero/nil value"
 		return c.JSON(r)
 	}
+	r.Status.Success = true
 
 	sql_code := `WITH rows AS ( 
 		INSERT INTO tiger_bio(name,dob) 
@@ -50,7 +43,7 @@ func create_tiger(c *fiber.Ctx) error {
 		VALUES( $3, $4, $5, (SELECT id FROM rows) )
 	RETURNING tiger_id;`
 
-	row := DB.QueryRow(sql_code, p.Name, p.Dob, p.LastSeen, p.GeoLocation[0], p.GeoLocation[1])
+	row := DB.QueryRow(sql_code, p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude)
 
 	err := row.Scan(&r.Data.Id)
 	CheckError(err)
@@ -77,13 +70,12 @@ func check_tiger(c *fiber.Ctx) error {
 	//parsing payload JSON to struct
 	c.BodyParser(&p)
 	//Validating the payload fields
-	switch {
-	case p.Name == "" || p.Dob == "":
+	if p.Name == "" || p.Dob == "" {
 		r.Status.Message = "name/birthday field should not be blank/zero/nil value"
 		return c.JSON(r)
-	default:
-		r.Status.Success = true
 	}
+
+	r.Status.Success = true
 
 	sql_code := `SELECT id FROM tiger_bio WHERE name=$1 AND dob=$2 LIMIT 1;`
 
@@ -98,10 +90,8 @@ func check_tiger(c *fiber.Ctx) error {
 	return c.JSON(r)
 }
 
-/*
-//Create a new sighting of a tiger
+//Create a new sighting of existing tiger
 func create_sighting(c *fiber.Ctx) error {
 
 	return c.JSON("response")
 }
-*/
