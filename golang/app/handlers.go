@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -40,24 +41,26 @@ func create_tiger(c *fiber.Ctx) error {
 	)
 
 	INSERT INTO 
-	sighting_info(seen_time,latitude,longitude,tiger_id) 
-		VALUES( $3, $4, $5, (SELECT id FROM rows) )
+	sighting_info(seen_time,latitude,longitude,image,tiger_id) 
+		VALUES( $3, $4, $5, $6, (SELECT id FROM rows) )
 	RETURNING tiger_id, id;`
 
-	row := DB.QueryRow(sql_code, p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude)
-
-	err := row.Scan(&r.Data.TigerId, &r.Data.SightingId)
+	img_path, _ := save_tiger_image(c, r.Data.SightingId)
+	stmt, err := DB.Prepare(sql_code)
 	CheckError(err)
+	defer stmt.Close()
+	row := stmt.QueryRow(p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude, img_path)
 
-	save_tiger_image(c, r.Data.SightingId)
+	err = row.Scan(&r.Data.TigerId, &r.Data.SightingId)
+	CheckError(err)
 
 	return c.JSON(r)
 }
 
-func save_tiger_image(c *fiber.Ctx, id int64) error {
+func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
 	file, _ := c.FormFile("image")
 	filename := os.Getenv("IMAGE_FOLDER") + strconv.FormatInt(id, 10) + file.Filename
-	return c.SaveFile(file, filename)
+	return filename, c.SaveFile(file, filename)
 }
 
 //Check if the tiger already exists in the database
@@ -118,14 +121,19 @@ func create_sighting(c *fiber.Ctx) error {
 	}
 
 	sql_code := `INSERT INTO 
-	sighting_info(seen_time,latitude,longitude,tiger_id) 
-	VALUES( $1, $2, $3, $4 )
+	sighting_info(seen_time,latitude,longitude,image,tiger_id) 
+	VALUES( $1, $2, $3, $4, $5 )
 	RETURNING id;`
 
-	row := DB.QueryRow(sql_code, p.LastSeen, p.Latitude, p.Longitude, p.TigerId)
-	err := row.Scan(&r.Data.SightingId)
+	img_path, _ := save_tiger_image(c, r.Data.SightingId)
+	stmt, err := DB.Prepare(sql_code)
+	CheckError(err)
+	defer stmt.Close()
+	row := stmt.QueryRow(p.LastSeen, p.Latitude, p.Longitude, img_path, p.TigerId)
+	err = row.Scan(&r.Data.SightingId)
 
 	if err != nil {
+		fmt.Println(err.Error())
 		r.Data.SightingId = 0
 		r.Status.Message = "There was an error creating the record. Make sure whether the given tiger_id already exists."
 		c.Status(400)

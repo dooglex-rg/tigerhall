@@ -46,12 +46,28 @@ type TigerIdModel struct {
 	TigerId int64 `json:"tiger_id" form:"tiger_id"`
 }
 
+type SightingIdModel struct {
+	SightingId int64 `json:"sighting_id" form:"sighting_id"`
+}
+
 //Outgoing Response format for adding a new tiger
 type ResponseTiger struct {
 	ErrorStatus
 	//Data field
 	Data struct {
 		TigerIdModel
-		SightingId int64 `json:"sighting_id" form:"sighting_id"`
+		SightingIdModel
+	} `json:"data"`
+}
+
+//Outgoing Response format for show tigers
+type ResponseShowTigers struct {
+	ErrorStatus
+	//Data field
+	Data struct {
+		TigerIdModel
+		PayloadTigerBio
+		SightingIdModel
+		SightingInfo
 	} `json:"data"`
 }
