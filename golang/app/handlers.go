@@ -21,16 +21,17 @@ func create_tiger(c *fiber.Ctx) error {
 	var p PayloadAddNewTiger
 
 	//response variable
-	var r ResponseNewTiger
+	var r ResponseTiger
 
 	//parsing payload JSON to struct
 	c.BodyParser(&p)
 	//Validating the payload fields
 	if p.Name == "" || p.Dob == "" || p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0 {
 		r.Status.Message = "name/birthday/last_seen/geo fields should not be blank/zero/nil value"
+		c.Status(400)
+		r.Status.Error = true
 		return c.JSON(r)
 	}
-	r.Status.Success = true
 
 	sql_code := `WITH rows AS ( 
 		INSERT INTO tiger_bio(name,dob) 
@@ -39,16 +40,16 @@ func create_tiger(c *fiber.Ctx) error {
 	)
 
 	INSERT INTO 
-		last_seen(seen_time,latitude,longitude,tiger_id) 
+	sighting_info(seen_time,latitude,longitude,tiger_id) 
 		VALUES( $3, $4, $5, (SELECT id FROM rows) )
-	RETURNING tiger_id;`
+	RETURNING tiger_id, id;`
 
 	row := DB.QueryRow(sql_code, p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude)
 
-	err := row.Scan(&r.Data.Id)
+	err := row.Scan(&r.Data.TigerId, &r.Data.SightingId)
 	CheckError(err)
 
-	save_tiger_image(c, r.Data.Id)
+	save_tiger_image(c, r.Data.SightingId)
 
 	return c.JSON(r)
 }
@@ -65,23 +66,27 @@ func check_tiger(c *fiber.Ctx) error {
 	var p PayloadTigerBio
 
 	//response variable
-	var r ResponseNewTiger
+	var r ResponseTiger
 
 	//parsing payload JSON to struct
 	c.BodyParser(&p)
 	//Validating the payload fields
 	if p.Name == "" || p.Dob == "" {
 		r.Status.Message = "name/birthday field should not be blank/zero/nil value"
+		c.Status(400)
+		r.Status.Error = true
 		return c.JSON(r)
 	}
 
-	r.Status.Success = true
-
 	sql_code := `SELECT id FROM tiger_bio WHERE name=$1 AND dob=$2 LIMIT 1;`
 
-	row := DB.QueryRow(sql_code, p.Name, p.Dob)
+	stmt, err := DB.Prepare(sql_code)
+	CheckError(err)
+	defer stmt.Close()
 
-	err := row.Scan(&r.Data.Id)
+	row := stmt.QueryRow(p.Name, p.Dob)
+
+	err = row.Scan(&r.Data.TigerId)
 
 	if err != nil && err != sql.ErrNoRows {
 		CheckError(err)
@@ -92,6 +97,44 @@ func check_tiger(c *fiber.Ctx) error {
 
 //Create a new sighting of existing tiger
 func create_sighting(c *fiber.Ctx) error {
+	//payload variable
+	var p PayloadAddSighting
+	var r ResponseTiger
 
-	return c.JSON("response")
+	//parsing payload JSON to struct
+	c.BodyParser(&p)
+
+	switch {
+	case p.TigerId == 0:
+		r.Status.Message = "tiger_id is required to add new sighting of existing tiger. To add a record for a new tiger & its sighting, use '/tiger/add' endpoint."
+		c.Status(400)
+		r.Status.Error = true
+		return c.JSON(r)
+	case p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0:
+		r.Status.Message = "last_seen/geo fields should not be blank/zero/nil value"
+		c.Status(400)
+		r.Status.Error = true
+		return c.JSON(r)
+	}
+
+	sql_code := `INSERT INTO 
+	sighting_info(seen_time,latitude,longitude,tiger_id) 
+	VALUES( $1, $2, $3, $4 )
+	RETURNING id;`
+
+	row := DB.QueryRow(sql_code, p.LastSeen, p.Latitude, p.Longitude, p.TigerId)
+	err := row.Scan(&r.Data.SightingId)
+
+	if err != nil {
+		r.Data.SightingId = 0
+		r.Status.Message = "There was an error creating the record. Make sure whether the given tiger_id already exists."
+		c.Status(400)
+		r.Status.Error = true
+		return c.JSON(r)
+	}
+
+	r.Data.TigerId = p.TigerId
+	save_tiger_image(c, r.Data.SightingId)
+
+	return c.JSON(r)
 }

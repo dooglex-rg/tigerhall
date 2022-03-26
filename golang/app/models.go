@@ -7,7 +7,7 @@ type ErrorStatus struct {
 	//status of the error occurence in the current response
 	Status struct {
 		//Whether the current response processed successfully
-		Success bool `json:"success"`
+		Error bool `json:"error"`
 		//Error message incase of any error.
 		Message string `json:"message"`
 	} `json:"status"`
@@ -21,7 +21,7 @@ type PayloadTigerBio struct {
 	Dob string `json:"birthday" form:"birthday"`
 }
 
-type PayloadSightingInfo struct {
+type SightingInfo struct {
 	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
 	LastSeen string `json:"last_seen" form:"last_seen"`
 	//Last seen Latitude point
@@ -33,15 +33,25 @@ type PayloadSightingInfo struct {
 //Parsing Request payload to add a new tiger
 type PayloadAddNewTiger struct {
 	PayloadTigerBio
-	PayloadSightingInfo
+	SightingInfo
+}
+
+type PayloadAddSighting struct {
+	SightingInfo
+	TigerIdModel
+}
+
+//id of the the Tiger
+type TigerIdModel struct {
+	TigerId int64 `json:"tiger_id" form:"tiger_id"`
 }
 
 //Outgoing Response format for adding a new tiger
-type ResponseNewTiger struct {
+type ResponseTiger struct {
 	ErrorStatus
 	//Data field
 	Data struct {
-		//id of the the Tiger
-		Id int64 `json:"tiger_id"`
+		TigerIdModel
+		SightingId int64 `json:"sighting_id" form:"sighting_id"`
 	} `json:"data"`
 }

@@ -19,4 +19,4 @@ class Spotting(models.Model):
     image = models.CharField(max_length = 250, db_column='image', null=True, default=None)
 
     class Meta:
-        db_table = "last_seen"
+        db_table = "sighting_info"
