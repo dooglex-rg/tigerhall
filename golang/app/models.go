@@ -1,7 +1,5 @@
 package main
 
-import "time"
-
 /*"models.go" file defines various structs used in this app*/
 
 //A basic API Response containing default fields for error status
@@ -15,16 +13,21 @@ type ErrorStatus struct {
 	} `json:"status"`
 }
 
-//Parsing Request payload to add a new tiger
-type PayloadNewTiger struct {
+//Bio of the tiger
+type PayloadTigerBio struct {
 	//Name of the tiger
-	Name string `json:"name"`
-	//Date of birth of the tiger. Must be in RFC3339 format.
-	Dob time.Time `json:"birthday"`
-	//Timestamp when the tiger was last seen. Must be in RFC3339 format.
-	LastSeen time.Time `json:"last_seen"`
+	Name string `json:"name" form:"name"`
+	//Date of birth of the tiger. Must be in YYYY-MM-DD format.
+	Dob string `json:"birthday" form:"birthday"`
+}
+
+//Parsing Request payload to add a new tiger
+type PayloadAddNewTiger struct {
+	PayloadTigerBio
+	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
+	LastSeen string `json:"last_seen" form:"last_seen"`
 	//Last seen cordinate points [lat,lon]
-	GeoLocation [2]float64 `json:"cordinates"`
+	GeoLocation [2]float64 `json:"cordinates" form:"cordinates"`
 }
 
 //Outgoing Response format for adding a new tiger
@@ -32,7 +35,7 @@ type ResponseNewTiger struct {
 	ErrorStatus
 	//Data field
 	Data struct {
-		//id of the newly created Tiger
+		//id of the the Tiger
 		Id int64 `json:"tiger_id"`
 	} `json:"data"`
 }

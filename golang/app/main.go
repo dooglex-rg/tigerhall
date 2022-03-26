@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
@@ -15,16 +17,16 @@ import (
 var DB *sql.DB
 
 func main() {
-	const (
-		host     = "kandula.db.elephantsql.com"
-		port     = 5432
-		user     = "nrkisatu"
-		password = "rzrCj-txNNA1zJhC8xdGy6hmXvr7vlkG"
-		dbname   = "nrkisatu"
-	)
-	DSN := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	err := godotenv.Load(".env")
+	CheckError(err)
 
-	var err error
+	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME"),
+	)
 
 	//Creating DB connection
 	DB, err = sql.Open("postgres", DSN)
@@ -46,13 +48,14 @@ func main() {
 	middleware_config(app)
 	url_router(app)
 
-	log.Fatal(app.Listen("localhost:40619"))
+	log.Fatal(app.Listen(os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT")))
 }
 
 //Routing of incoming URLs with its handlers
 func url_router(app *fiber.App) {
 	app.Get("/", index_page)
 	app.Post("/tiger/new", create_tiger)
+	app.Post("/tiger/check", check_tiger)
 }
 
 //Middlewares configuration
@@ -67,6 +70,7 @@ func middleware_config(app *fiber.App) {
 //General error checking function
 func CheckError(err error) {
 	if err != nil {
+		log.Println(err.Error())
 		panic(err)
 	}
 }

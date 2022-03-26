@@ -16,14 +16,7 @@ class Spotting(models.Model):
     seen_time = models.DateTimeField(db_column='seen_time')
     latitude = models.DecimalField(max_digits=22, decimal_places=16,db_column='latitude')
     longitude = models.DecimalField(max_digits=22, decimal_places=16, db_column='longitude')
+    image = models.CharField(max_length = 250, db_column='image', null=True, default=None)
 
     class Meta:
         db_table = "last_seen"
-
-class FilePath(models.Model):
-    """saving path of the uploaded file"""
-    spotting = models.ForeignKey(Spotting, on_delete=models.DO_NOTHING, related_name='tiger_images', default=None)
-    file_path = models.TextField(db_column='file_path')
-    
-    class Meta:
-        db_table = "file_paths"
