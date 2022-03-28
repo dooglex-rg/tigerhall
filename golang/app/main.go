@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -88,7 +90,26 @@ func CheckError(err, exempt error) {
 	}
 }
 
-func schedule_image_resize(image_path string) {
-	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), []byte(image_path), asynq.MaxRetry(1))
+func schedule_image_resize(file_name, id string) {
+	i := map[string]string{
+		"filename": file_name,
+		"id":       id,
+	}
+	json_byte, _ := json.Marshal(i)
+	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), json_byte, asynq.MaxRetry(1))
 	client.Enqueue(task_item, asynq.Queue("critical"))
+}
+
+func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
+	//file content
+	file_stream, _ := c.FormFile("image")
+	//db row id
+	file_id := strconv.FormatInt(id, 10)
+	//name of the file
+	file_name := file_id + file_stream.Filename
+	//file destination path
+	file_path := os.Getenv("IMAGE_FOLDER") + file_name
+	//scheduling for image resizing queue
+	schedule_image_resize(file_name, file_id)
+	return file_path, c.SaveFile(file_stream, file_path)
 }

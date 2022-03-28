@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,7 +44,7 @@ func create_tiger(c *fiber.Ctx) error {
 		VALUES( $3, $4, $5, $6, (SELECT id FROM rows) )
 	RETURNING tiger_id, id;`
 
-	_, img_path, _ := save_tiger_image(c, r.Data.SightingId)
+	img_path, _ := save_tiger_image(c, r.Data.SightingId)
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)
 	defer stmt.Close()
@@ -55,13 +54,6 @@ func create_tiger(c *fiber.Ctx) error {
 	CheckError(err, sql.ErrNoRows)
 
 	return c.JSON(r)
-}
-
-func save_tiger_image(c *fiber.Ctx, id int64) (string, string, error) {
-	file_stream, _ := c.FormFile("image")
-	file_name := strconv.FormatInt(id, 10) + file_stream.Filename
-	file_path := os.Getenv("IMAGE_FOLDER") + file_name
-	return file_name, file_path, c.SaveFile(file_stream, file_path)
 }
 
 //Check if the tiger already exists in the database
@@ -145,7 +137,7 @@ func create_sighting(c *fiber.Ctx) error {
 	VALUES( $1, $2, $3, $4, $5 )
 	RETURNING id;`
 
-	_, img_path, _ := save_tiger_image(c, r.Data.SightingId)
+	img_path, _ := save_tiger_image(c, r.Data.SightingId)
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)
 	defer stmt.Close()
