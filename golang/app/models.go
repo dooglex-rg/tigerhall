@@ -28,6 +28,8 @@ type SightingInfo struct {
 	Latitude float64 `json:"latitude" form:"latitude"`
 	//Last seen Longitude point
 	Longitude float64 `json:"longitude" form:"longitude"`
+	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
+	Image string `json:"image" form:"image"`
 }
 
 //Parsing Request payload to add a new tiger
@@ -60,14 +62,33 @@ type ResponseTiger struct {
 	} `json:"data"`
 }
 
+type ShowTigerModel struct {
+	TigerIdModel
+	PayloadTigerBio
+	SightingIdModel
+	SightingInfo
+}
+
+type TotalResultsModel struct {
+	Count int `json:"total_results"`
+}
+
 //Outgoing Response format for show tigers
 type ResponseShowTigers struct {
 	ErrorStatus
 	//Data field
 	Data struct {
-		TigerIdModel
-		PayloadTigerBio
-		SightingIdModel
-		SightingInfo
+		TotalResultsModel
+		Tigers []ShowTigerModel `json:"tiger_data"`
+	} `json:"data"`
+}
+
+//Outgoing Response format for show tigers
+type ResponseShowSighting struct {
+	ErrorStatus
+	//Data field
+	Data struct {
+		TotalResultsModel
+		Sightings []SightingInfo `json:"sighting_data"`
 	} `json:"data"`
 }

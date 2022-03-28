@@ -18,7 +18,7 @@ var DB *sql.DB
 
 func main() {
 	err := godotenv.Load(".env")
-	CheckError(err)
+	CheckError(err, nil)
 
 	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -30,12 +30,12 @@ func main() {
 
 	//Creating DB connection
 	DB, err = sql.Open("postgres", DSN)
-	CheckError(err)
+	CheckError(err, nil)
 
 	defer DB.Close()
 
 	//Ping test to db
-	CheckError(DB.Ping())
+	CheckError(DB.Ping(), nil)
 
 	//Based on free tier limit
 	//https://www.elephantsql.com/plans.html
@@ -54,9 +54,12 @@ func main() {
 //Routing of incoming URLs with its handlers
 func url_router(app *fiber.App) {
 	app.Get("/", index_page)
+
 	app.Post("/tiger/add", create_tiger)
-	app.Post("/tiger/show", check_tiger)
+	app.Post("/tiger/show", show_tigers)
+
 	app.Post("/sighting/add", create_sighting)
+	app.Post("/sighting/show", show_sighting)
 }
 
 //Middlewares configuration
@@ -68,10 +71,12 @@ func middleware_config(app *fiber.App) {
 	}))
 }
 
-//General error checking function
-func CheckError(err error) {
-	if err != nil {
-		log.Println(err.Error())
-		panic(err)
+//General error checking function with provision for given exemption
+func CheckError(err, exempt error) {
+	switch err {
+	case nil, exempt:
+		return
+	default:
+		log.Fatal(err)
 	}
 }

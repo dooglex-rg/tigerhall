@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -47,12 +47,12 @@ func create_tiger(c *fiber.Ctx) error {
 
 	img_path, _ := save_tiger_image(c, r.Data.SightingId)
 	stmt, err := DB.Prepare(sql_code)
-	CheckError(err)
+	CheckError(err, nil)
 	defer stmt.Close()
 	row := stmt.QueryRow(p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude, img_path)
 
 	err = row.Scan(&r.Data.TigerId, &r.Data.SightingId)
-	CheckError(err)
+	CheckError(err, sql.ErrNoRows)
 
 	return c.JSON(r)
 }
@@ -64,35 +64,54 @@ func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
 }
 
 //Check if the tiger already exists in the database
-func check_tiger(c *fiber.Ctx) error {
-	//payload variable
-	var p PayloadTigerBio
+func show_tigers(c *fiber.Ctx) error {
+	page_no, _ := strconv.Atoi(c.Query("page", "1"))
 
-	//response variable
-	var r ResponseTiger
-
-	//parsing payload JSON to struct
-	c.BodyParser(&p)
-	//Validating the payload fields
-	if p.Name == "" || p.Dob == "" {
-		r.Status.Message = "name/birthday field should not be blank/zero/nil value"
-		c.Status(400)
-		r.Status.Error = true
-		return c.JSON(r)
-	}
-
-	sql_code := `SELECT id FROM tiger_bio WHERE name=$1 AND dob=$2 LIMIT 1;`
+	sql_code := `
+	SELECT 
+		si.tiger_id, 
+		tb.name, 
+		tb.dob, 
+		si.seen_time, 
+		si.latitude, 
+		si.longitude, 
+		si.image,
+		count(si.id) OVER() AS full_count
+	FROM sighting_info si
+	
+	LEFT JOIN tiger_bio tb
+	ON si.tiger_id = tb.id 
+	
+	WHERE si.seen_time = (
+		SELECT MAX(si2.seen_time)
+		FROM sighting_info si2
+		WHERE si2.tiger_id = si.tiger_id
+	)
+	ORDER BY dob DESC
+	LIMIT 10
+	OFFSET $1;`
 
 	stmt, err := DB.Prepare(sql_code)
-	CheckError(err)
+	CheckError(err, nil)
 	defer stmt.Close()
 
-	row := stmt.QueryRow(p.Name, p.Dob)
+	//offset logic
+	rows, err := stmt.Query((page_no - 1) * 10)
+	CheckError(err, sql.ErrNoRows)
 
-	err = row.Scan(&r.Data.TigerId)
+	var r ResponseShowTigers
+	for rows.Next() {
+		var data ShowTigerModel
+		err := rows.Scan(&data.TigerId, &data.Name, &data.Dob, &data.LastSeen, &data.Latitude, &data.Longitude, &data.Image, &r.Data.Count)
+		r.Data.Tigers = append(r.Data.Tigers, data)
+		if err != nil && err != sql.ErrNoRows {
+			log.Fatal(err)
+		}
+	}
 
-	if err != nil && err != sql.ErrNoRows {
-		CheckError(err)
+	if r.Data.Count == 0 {
+		r.Status.Error = true
+		r.Status.Message = "No results found!"
 	}
 
 	return c.JSON(r)
@@ -127,13 +146,12 @@ func create_sighting(c *fiber.Ctx) error {
 
 	img_path, _ := save_tiger_image(c, r.Data.SightingId)
 	stmt, err := DB.Prepare(sql_code)
-	CheckError(err)
+	CheckError(err, nil)
 	defer stmt.Close()
 	row := stmt.QueryRow(p.LastSeen, p.Latitude, p.Longitude, img_path, p.TigerId)
 	err = row.Scan(&r.Data.SightingId)
 
 	if err != nil {
-		fmt.Println(err.Error())
 		r.Data.SightingId = 0
 		r.Status.Message = "There was an error creating the record. Make sure whether the given tiger_id already exists."
 		c.Status(400)
@@ -143,6 +161,50 @@ func create_sighting(c *fiber.Ctx) error {
 
 	r.Data.TigerId = p.TigerId
 	save_tiger_image(c, r.Data.SightingId)
+
+	return c.JSON(r)
+}
+
+//Check if the tiger already exists in the database
+func show_sighting(c *fiber.Ctx) error {
+	page_no, _ := strconv.Atoi(c.Query("page", "1"))
+	var tiger_id TigerIdModel
+	c.BodyParser(&tiger_id)
+	sql_code := `
+	SELECT 		
+		si.seen_time, 
+		si.latitude, 
+		si.longitude, 
+		si.image,
+		count(si.id) OVER() AS full_count
+	FROM sighting_info si
+
+	WHERE si.tiger_id = $1
+	LIMIT 10
+	OFFSET $2;`
+
+	stmt, err := DB.Prepare(sql_code)
+	CheckError(err, nil)
+	defer stmt.Close()
+
+	//offset logic
+	rows, err := stmt.Query(tiger_id.TigerId, (page_no-1)*10)
+	CheckError(err, sql.ErrNoRows)
+
+	var r ResponseShowSighting
+	for rows.Next() {
+		var data SightingInfo
+		err := rows.Scan(&data.LastSeen, &data.Latitude, &data.Longitude, &data.Image, &r.Data.Count)
+		r.Data.Sightings = append(r.Data.Sightings, data)
+		if err != nil && err != sql.ErrNoRows {
+			log.Fatal(err)
+		}
+	}
+
+	if r.Data.Count == 0 {
+		r.Status.Error = true
+		r.Status.Message = "No results found!"
+	}
 
 	return c.JSON(r)
 }
