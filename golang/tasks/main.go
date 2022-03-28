@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -23,6 +23,7 @@ import (
 var DB *sql.DB
 
 func main() {
+	godotenv.Load(".env")
 
 	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -46,10 +47,13 @@ func main() {
 	//Ping test to db
 	CheckError(DB.Ping(), nil)
 
-	godotenv.Load(".env")
 	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
 	worker := asynq.NewServer(
-		asynq.RedisClientOpt{Addr: redis_url},
+		asynq.RedisClientOpt{
+			Addr:     redis_url,
+			Username: os.Getenv("REDIS_USER"),
+			Password: os.Getenv("REDIS_PASS"),
+		},
 		asynq.Config{
 			Concurrency: 10,
 			Queues: map[string]int{
@@ -82,11 +86,13 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 
 	var img image.Image
 
-	switch filepath.Ext(img_path) {
-	case ".jpeg":
+	switch i["ext"] {
+	case ".jpeg", ".jpg":
 		img, err = jpeg.Decode(file)
 	case ".png":
 		img, err = png.Decode(file)
+	default:
+		return errors.New("image format not supported")
 	}
 	if err != nil {
 		log.Panic(err)

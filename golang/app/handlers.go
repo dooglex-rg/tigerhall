@@ -153,7 +153,7 @@ func create_sighting(c *fiber.Ctx) error {
 	}
 
 	r.Data.TigerId = p.TigerId
-	save_tiger_image(c, r.Data.SightingId)
+	//save_tiger_image(c, r.Data.SightingId)
 
 	return c.JSON(r)
 }

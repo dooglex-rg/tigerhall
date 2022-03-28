@@ -1,13 +1,12 @@
-makemigrations:
+setup:
 	python ./python/db_manager_proj/manage.py makemigrations
-
-migrate:
 	python ./python/db_manager_proj/manage.py migrate
+	cd golang && go mod tidy
 
-start_app:
-	cd golang && go build -o ./bin/app ./app/ 
-	./golang/bin/app
+app:
+	cd golang && go build -o ./bin/app.exe ./app/ 
+	./golang/bin/app.exe
 
-start_task:
-	cd golang && go build -o ./bin/tasks ./tasks/
-	./golang/bin/tasks
+consumer:
+	cd golang && go build -o ./bin/tasks.exe ./tasks/
+	./golang/bin/tasks.exe

@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 
@@ -43,9 +45,9 @@ func main() {
 
 	//Based on free tier limit
 	//https://www.elephantsql.com/plans.html
-	DB.SetConnMaxLifetime(time.Minute * 5)
-	DB.SetMaxOpenConns(2)
-	DB.SetMaxIdleConns(2)
+	DB.SetConnMaxLifetime(time.Minute * 1)
+	DB.SetMaxOpenConns(1)
+	DB.SetMaxIdleConns(1)
 
 	//Fiber app instance
 	app := fiber.New()
@@ -53,7 +55,11 @@ func main() {
 	url_router(app)
 
 	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
-	client = asynq.NewClient(asynq.RedisClientOpt{Addr: redis_url})
+	client = asynq.NewClient(asynq.RedisClientOpt{
+		Addr:     redis_url,
+		Username: os.Getenv("REDIS_USER"),
+		Password: os.Getenv("REDIS_PASS"),
+	})
 	defer client.Close()
 
 	server_url := os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT")
@@ -90,10 +96,11 @@ func CheckError(err, exempt error) {
 	}
 }
 
-func schedule_image_resize(file_name, id string) {
+func schedule_image_resize(file_name, id, file_extention string) {
 	i := map[string]string{
 		"filename": file_name,
 		"id":       id,
+		"ext":      file_extention,
 	}
 	json_byte, _ := json.Marshal(i)
 	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), json_byte, asynq.MaxRetry(1))
@@ -103,13 +110,12 @@ func schedule_image_resize(file_name, id string) {
 func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
 	//file content
 	file_stream, _ := c.FormFile("image")
-	//db row id
-	file_id := strconv.FormatInt(id, 10)
 	//name of the file
-	file_name := file_id + file_stream.Filename
+	file_extention := filepath.Ext(file_stream.Filename)
+	file_name := uuid.New().String() + file_extention
 	//file destination path
 	file_path := os.Getenv("IMAGE_FOLDER") + file_name
 	//scheduling for image resizing queue
-	schedule_image_resize(file_name, file_id)
+	schedule_image_resize(file_name, strconv.FormatInt(id, 10), file_extention)
 	return file_path, c.SaveFile(file_stream, file_path)
 }
