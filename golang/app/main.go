@@ -9,12 +9,14 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
+var client *asynq.Client
 
 func main() {
 	err := godotenv.Load(".env")
@@ -48,7 +50,12 @@ func main() {
 	middleware_config(app)
 	url_router(app)
 
-	log.Fatal(app.Listen(os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT")))
+	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
+	client = asynq.NewClient(asynq.RedisClientOpt{Addr: redis_url})
+	defer client.Close()
+
+	server_url := os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT")
+	log.Fatal(app.Listen(server_url))
 }
 
 //Routing of incoming URLs with its handlers
@@ -77,6 +84,11 @@ func CheckError(err, exempt error) {
 	case nil, exempt:
 		return
 	default:
-		log.Fatal(err)
+		log.Panic(err)
 	}
+}
+
+func schedule_image_resize(image_path string) {
+	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), []byte(image_path), asynq.MaxRetry(1))
+	client.Enqueue(task_item, asynq.Queue("critical"))
 }
