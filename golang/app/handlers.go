@@ -19,7 +19,6 @@ func index_page(c *fiber.Ctx) error {
 // @Description Create a new tiger along with the last seen info
 // @Tags Tiger
 // @ID create_tiger
-// @Accept  json,mpfd,x-www-form-urlencoded
 // @Produce  json
 // @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddNewTiger true "Request payload"
@@ -29,11 +28,11 @@ func create_tiger(c *fiber.Ctx) error {
 	//response data variable
 	var r ResponseTiger
 
-	name, dob, seen, lat, long := c.FormValue("name"), c.FormValue("birthday"),
-		c.FormValue("last_seen"), c.FormValue("latitude"), c.FormValue("longitude")
+	var p PayloadAddNewTiger
+
+	c.BodyParser(&p)
 	//Validating the payload fields
-	switch "" {
-	case name, dob, seen, lat, long:
+	if p.Name == "" || p.Dob == "" || p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0 {
 		r.Status.Message = "name/birthday/last_seen/geo fields should not be blank/zero/nil value"
 		c.Status(400)
 		r.Status.Error = true
@@ -59,7 +58,7 @@ func create_tiger(c *fiber.Ctx) error {
 	CheckError(err, nil)
 	defer stmt.Close()
 
-	row := stmt.QueryRow(name, dob, seen, lat, long, img_path)
+	row := stmt.QueryRow(p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude, img_path)
 
 	err = row.Scan(&r.Data.TigerId, &r.Data.SightingId)
 	CheckError(err, sql.ErrNoRows)
