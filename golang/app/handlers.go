@@ -2,9 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/hibiken/asynq"
 )
 
 //A sample JSON response for index page
@@ -19,9 +24,8 @@ func index_page(c *fiber.Ctx) error {
 // @Description Create a new tiger along with the last seen info
 // @Tags Tiger
 // @ID create_tiger
-// @Accept mpfd
+// @Accept json
 // @Produce  json
-// @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddNewTiger true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /tiger/add [post]
@@ -50,15 +54,12 @@ func create_tiger(c *fiber.Ctx) error {
 		VALUES( $3, $4, $5, $6, (SELECT id FROM rows) )
 	RETURNING tiger_id, id;`
 
-	//save uploaded image to storage
-	img_path, _ := save_tiger_image(c, r.Data.SightingId)
-
 	//sql prepare statement
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)
 	defer stmt.Close()
 
-	row := stmt.QueryRow(p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude, img_path)
+	row := stmt.QueryRow(p.Name, p.Dob, p.LastSeen, p.Latitude, p.Longitude, p.Image)
 
 	err = row.Scan(&r.Data.TigerId, &r.Data.SightingId)
 	CheckError(err, sql.ErrNoRows)
@@ -71,7 +72,7 @@ func create_tiger(c *fiber.Ctx) error {
 // @Description show the list of tigers sorted by last seen time
 // @Tags Tiger
 // @ID show_tigers
-// @Accept mpfd
+// @Accept json
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Success 200 {object} ResponseShowTigers
@@ -135,9 +136,8 @@ func show_tigers(c *fiber.Ctx) error {
 // @Description Create a new sighting of existing tiger
 // @Tags Tiger
 // @ID create_sighting
-// @Accept mpfd
+// @Accept json
 // @Produce  json
-// @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddSighting true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /sighting/add [post]
@@ -169,12 +169,10 @@ func create_sighting(c *fiber.Ctx) error {
 	VALUES( $1, $2, $3, $4, $5 )
 	RETURNING id;`
 
-	//save image to storage
-	img_path, _ := save_tiger_image(c, r.Data.SightingId)
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)
 	defer stmt.Close()
-	row := stmt.QueryRow(p.LastSeen, p.Latitude, p.Longitude, img_path, p.TigerId)
+	row := stmt.QueryRow(p.LastSeen, p.Latitude, p.Longitude, p.Image, p.TigerId)
 	err = row.Scan(&r.Data.SightingId)
 
 	//In case of any db update error like foreign key constraint error
@@ -196,7 +194,7 @@ func create_sighting(c *fiber.Ctx) error {
 // @Description show the list of sightings of tigers
 // @Tags Tiger
 // @ID show_sighting
-// @Accept mpfd
+// @Accept json
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Param Body body TigerIdModel true "Request payload"
@@ -246,4 +244,44 @@ func show_sighting(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(r)
+}
+
+// GoDoc godoc
+// @Summary image upload endpoint
+// @Description image upload endpoint
+// @Tags Tiger
+// @ID handle_upload
+// @Accept mpfd
+// @Produce  json
+// @Param image formData file true  "Image Upload"
+// @Success 200 {object} ImageId
+// @Router /upload/image [post]
+func save_tiger_image(c *fiber.Ctx) error {
+	//file content
+	file_stream, _ := c.FormFile("image")
+	//name of the file
+	file_extention := filepath.Ext(file_stream.Filename)
+	file_name := uuid.New().String() + file_extention
+	//file destination path
+	file_path := os.Getenv("IMAGE_FOLDER") + file_name
+	//scheduling for image resizing queue
+	schedule_image_resize(file_name, file_extention)
+
+	c.SaveFile(file_stream, file_path)
+
+	return c.JSON(ImageId{Image: file_name})
+}
+
+//Schedule image resizing function for later queue to
+//make responses quicker & to avoid memory crash
+func schedule_image_resize(file_name, file_extention string) {
+	i := map[string]string{
+		"filename": file_name,
+		"ext":      file_extention,
+	}
+	json_byte, _ := json.Marshal(i)
+	//create task
+	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), json_byte, asynq.MaxRetry(1))
+	//send to queue
+	client.Enqueue(task_item, asynq.Queue("critical"))
 }

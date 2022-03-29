@@ -29,8 +29,7 @@ type SightingInfo struct {
 	Latitude float64 `json:"latitude" form:"latitude" example:"120.51687"`
 	//Last seen Longitude point
 	Longitude float64 `json:"longitude" form:"longitude" example:"50.894914"`
-	//path to uploaded image.
-	Image string `json:"image" form:"image" example:"path/to/image"`
+	ImageId
 }
 
 //Parsing Request payload to add a new tiger
@@ -99,4 +98,10 @@ type ResponseShowSighting struct {
 		TotalResultsModel
 		Sightings []SightingInfo `json:"sighting_data"`
 	} `json:"data"`
+}
+
+//id of the the Tiger
+type ImageId struct {
+	//path to uploaded image.
+	Image string `json:"image_id" form:"image_id" example:"generatedimageuuid"`
 }

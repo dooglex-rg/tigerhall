@@ -2,19 +2,15 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"os"
-	"path/filepath"
-	"strconv"
 	"time"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 
@@ -96,6 +92,8 @@ func url_router(app *fiber.App) {
 	app.Post("/sighting/add", create_sighting)
 	app.Post("/sighting/show", show_sighting)
 
+	app.Post("/upload/image", save_tiger_image)
+
 	app.Get("/api-docs/*", swagger.New(swagger.Config{
 		Title:                    "Swagger API docs",
 		URL:                      "/api-docs/doc.json",
@@ -141,33 +139,4 @@ func CheckError(err, exempt error) {
 	default:
 		log.Panic(err)
 	}
-}
-
-//Schedule image resizing function for later queue to
-//make responses quicker & to avoid memory crash
-func schedule_image_resize(file_name, id, file_extention string) {
-	i := map[string]string{
-		"filename": file_name,
-		"id":       id,
-		"ext":      file_extention,
-	}
-	json_byte, _ := json.Marshal(i)
-	//create task
-	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), json_byte, asynq.MaxRetry(1))
-	//send to queue
-	client.Enqueue(task_item, asynq.Queue("critical"))
-}
-
-//saves uploaded image to storage
-func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
-	//file content
-	file_stream, _ := c.FormFile("image")
-	//name of the file
-	file_extention := filepath.Ext(file_stream.Filename)
-	file_name := uuid.New().String() + file_extention
-	//file destination path
-	file_path := os.Getenv("IMAGE_FOLDER") + file_name
-	//scheduling for image resizing queue
-	schedule_image_resize(file_name, strconv.FormatInt(id, 10), file_extention)
-	return file_path, c.SaveFile(file_stream, file_path)
 }

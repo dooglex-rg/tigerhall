@@ -2,53 +2,22 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"log"
 	"os"
-	"time"
 
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 	"github.com/nfnt/resize"
-
-	_ "github.com/lib/pq"
 )
-
-//database instance
-var DB *sql.DB
 
 func main() {
 	//load enviroinment variable
 	godotenv.Load(".env")
-
-	//Creating DB connection
-	var err error
-	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_NAME"),
-	)
-
-	//Creating DB connection
-	DB, err = sql.Open("postgres", DSN)
-	CheckError(err, nil)
-
-	defer DB.Close()
-
-	DB.SetConnMaxLifetime(time.Minute * 5)
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(10)
-
-	//Ping test to db
-	CheckError(DB.Ping(), nil)
 
 	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
 
@@ -75,7 +44,7 @@ func main() {
 	server.HandleFunc(os.Getenv("TASK_NAME"), process_image_resize)
 
 	//server stated listening
-	err = worker.Run(server)
+	err := worker.Run(server)
 	CheckError(err, nil)
 }
 
@@ -109,20 +78,13 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 	// and preserves aspect ratio
 	m := resize.Resize(250, 200, img, resize.Lanczos3)
 
-	output_path := os.Getenv("IMAGE_FOLDER_RESIZED") + img_name
-	out, err := os.Create(output_path)
+	out, err := os.Create(img_path)
 	CheckError(err, nil)
 	defer out.Close()
 
 	// write resized image to file
 	jpeg.Encode(out, m, nil)
 
-	sql_code := `
-	UPDATE sighting_info 
-	SET image = $1
-	WHERE id = $2;`
-	//updates resized file path to DB
-	DB.Exec(sql_code, output_path, i["id"])
 	return nil
 }
 
