@@ -115,7 +115,8 @@ const docTemplate_swagger = `{
                 "description": "Create a new tiger along with the last seen info",
                 "consumes": [
                     "application/json",
-                    "multipart/form-data"
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"
