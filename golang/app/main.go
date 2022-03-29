@@ -60,9 +60,9 @@ func main() {
 	//Ping test to db
 	CheckError(DB.Ping(), nil)
 
-	DB.SetConnMaxLifetime(time.Minute * 1)
-	DB.SetMaxOpenConns(2)
-	DB.SetMaxIdleConns(2)
+	DB.SetConnMaxLifetime(time.Minute * 5)
+	DB.SetMaxOpenConns(12)
+	DB.SetMaxIdleConns(12)
 
 	//Fiber app instance
 	app := fiber.New()
