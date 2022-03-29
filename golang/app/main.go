@@ -19,10 +19,24 @@ import (
 	_ "github.com/lib/pq"
 )
 
+//database instance
 var DB *sql.DB
+
+//asynq task scheduler client
 var client *asynq.Client
 
+// @title Tigerhall test API
+// @version 1.0
+// @description This is an swagger documentation of simple test API task given by tigerhall
+// @termsOfService https://www.example.com/terms
+// @contact.name Tech Support
+// @contact.email rg@dooglex.com
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host tigerhall.dooglex.com
+// @BasePath /
 func main() {
+	//load env variables from .env file
 	err := godotenv.Load(".env")
 	CheckError(err, nil)
 
@@ -46,12 +60,16 @@ func main() {
 	//Based on free tier limit
 	//https://www.elephantsql.com/plans.html
 	DB.SetConnMaxLifetime(time.Minute * 1)
-	DB.SetMaxOpenConns(1)
-	DB.SetMaxIdleConns(1)
+	DB.SetMaxOpenConns(2)
+	DB.SetMaxIdleConns(2)
 
 	//Fiber app instance
 	app := fiber.New()
+
+	//middlewares setup
 	middleware_config(app)
+
+	//url routing
 	url_router(app)
 
 	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
@@ -63,6 +81,7 @@ func main() {
 	defer client.Close()
 
 	server_url := os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT")
+	//server listening
 	log.Fatal(app.Listen(server_url))
 }
 
@@ -96,6 +115,8 @@ func CheckError(err, exempt error) {
 	}
 }
 
+//Schedule image resizing function for later queue to
+//make responses quicker & to avoid memory crash
 func schedule_image_resize(file_name, id, file_extention string) {
 	i := map[string]string{
 		"filename": file_name,
@@ -103,10 +124,13 @@ func schedule_image_resize(file_name, id, file_extention string) {
 		"ext":      file_extention,
 	}
 	json_byte, _ := json.Marshal(i)
+	//create task
 	task_item := asynq.NewTask(os.Getenv("TASK_NAME"), json_byte, asynq.MaxRetry(1))
+	//send to queue
 	client.Enqueue(task_item, asynq.Queue("critical"))
 }
 
+//saves uploaded image to storage
 func save_tiger_image(c *fiber.Ctx, id int64) (string, error) {
 	//file content
 	file_stream, _ := c.FormFile("image")

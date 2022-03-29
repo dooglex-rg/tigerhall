@@ -20,9 +20,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
+//database instance
 var DB *sql.DB
 
 func main() {
+	//load enviroinment variable
 	godotenv.Load(".env")
 
 	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -48,6 +50,8 @@ func main() {
 	CheckError(DB.Ping(), nil)
 
 	redis_url := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
+
+	//worker config for listening to new tasks
 	worker := asynq.NewServer(
 		asynq.RedisClientOpt{
 			Addr:     redis_url,
@@ -64,20 +68,24 @@ func main() {
 		},
 	)
 
-	//Queue server listening for new tasks
+	//Queue server created
 	server := asynq.NewServeMux()
+	//task assignment
 	server.HandleFunc(os.Getenv("TASK_NAME"), process_image_resize)
+
+	//server stated listening
 	err = worker.Run(server)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	CheckError(err, nil)
 }
 
+//image resize function
 func process_image_resize(c context.Context, t *asynq.Task) error {
 	var i map[string]string
+	//fetching task related data
 	json.Unmarshal(t.Payload(), &i)
 	img_name := i["filename"]
 	img_path := os.Getenv("IMAGE_FOLDER") + img_name
+
 	file, err := os.Open(img_path)
 	if err != nil {
 		log.Fatal(err)
@@ -94,12 +102,10 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 	default:
 		return errors.New("image format not supported")
 	}
-	if err != nil {
-		log.Panic(err)
-	}
+	CheckError(err, nil)
 
 	// resize to using Lanczos resampling
-	// and preserve aspect ratio
+	// and preserves aspect ratio
 	m := resize.Resize(250, 200, img, resize.Lanczos3)
 
 	output_path := os.Getenv("IMAGE_FOLDER_RESIZED") + img_name
@@ -107,18 +113,19 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 	CheckError(err, nil)
 	defer out.Close()
 
-	// write new image to file
-
+	// write resized image to file
 	jpeg.Encode(out, m, nil)
 
 	sql_code := `
 	UPDATE sighting_info 
 	SET image = $1
 	WHERE id = $2;`
+	//updates resized file path to DB
 	DB.Exec(sql_code, output_path, i["id"])
 	return nil
 }
 
+//error checking with provision for exemption
 func CheckError(err, exempt error) {
 	switch err {
 	case nil, exempt:

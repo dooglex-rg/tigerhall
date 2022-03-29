@@ -21,6 +21,7 @@ type PayloadTigerBio struct {
 	Dob string `json:"birthday" form:"birthday"`
 }
 
+//fields for sighting
 type SightingInfo struct {
 	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
 	LastSeen string `json:"last_seen" form:"last_seen"`
@@ -38,6 +39,7 @@ type PayloadAddNewTiger struct {
 	SightingInfo
 }
 
+//add sighting payload
 type PayloadAddSighting struct {
 	SightingInfo
 	TigerIdModel
@@ -45,10 +47,13 @@ type PayloadAddSighting struct {
 
 //id of the the Tiger
 type TigerIdModel struct {
+	//id of the tiger
 	TigerId int64 `json:"tiger_id" form:"tiger_id"`
 }
 
+//sighting id field
 type SightingIdModel struct {
+	//primay key for sighting
 	SightingId int64 `json:"sighting_id" form:"sighting_id"`
 }
 
@@ -62,6 +67,7 @@ type ResponseTiger struct {
 	} `json:"data"`
 }
 
+//model for each tiger
 type ShowTigerModel struct {
 	TigerIdModel
 	PayloadTigerBio
@@ -69,7 +75,9 @@ type ShowTigerModel struct {
 	SightingInfo
 }
 
+//totals results found response model
 type TotalResultsModel struct {
+	//totals number of results found for the given query
 	Count int `json:"total_results"`
 }
 
