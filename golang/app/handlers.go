@@ -71,7 +71,6 @@ func create_tiger(c *fiber.Ctx) error {
 // @Description show the list of tigers sorted by last seen time
 // @Tags Tiger
 // @ID show_tigers
-// @Accept  json,mpfd
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Success 200 {object} ResponseShowTigers
@@ -135,7 +134,6 @@ func show_tigers(c *fiber.Ctx) error {
 // @Description Create a new sighting of existing tiger
 // @Tags Tiger
 // @ID create_sighting
-// @Accept  json,mpfd,x-www-form-urlencoded
 // @Produce  json
 // @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddSighting true "Request payload"
@@ -196,7 +194,6 @@ func create_sighting(c *fiber.Ctx) error {
 // @Description show the list of sightings of tigers
 // @Tags Tiger
 // @ID show_sighting
-// @Accept  json,mpfd
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Param Body body TigerIdModel true "Request payload"

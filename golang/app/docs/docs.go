@@ -27,11 +27,6 @@ const docTemplate_swagger = `{
         "/sighting/add": {
             "post": {
                 "description": "Create a new sighting of existing tiger",
-                "consumes": [
-                    "application/json",
-                    "multipart/form-data",
-                    "application/x-www-form-urlencoded"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -71,10 +66,6 @@ const docTemplate_swagger = `{
         "/sighting/show": {
             "post": {
                 "description": "show the list of sightings of tigers",
-                "consumes": [
-                    "application/json",
-                    "multipart/form-data"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -113,11 +104,6 @@ const docTemplate_swagger = `{
         "/tiger/add": {
             "post": {
                 "description": "Create a new tiger along with the last seen info",
-                "consumes": [
-                    "application/json",
-                    "multipart/form-data",
-                    "application/x-www-form-urlencoded"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -157,10 +143,6 @@ const docTemplate_swagger = `{
         "/tiger/show": {
             "post": {
                 "description": "show the list of tigers sorted by last seen time",
-                "consumes": [
-                    "application/json",
-                    "multipart/form-data"
-                ],
                 "produces": [
                     "application/json"
                 ],
