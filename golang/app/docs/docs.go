@@ -41,6 +41,13 @@ const docTemplate_swagger = `{
                 "operationId": "create_sighting",
                 "parameters": [
                     {
+                        "type": "file",
+                        "description": "Image Upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
                         "description": "Request payload",
                         "name": "Body",
                         "in": "body",
@@ -119,6 +126,13 @@ const docTemplate_swagger = `{
                 "operationId": "create_tiger",
                 "parameters": [
                     {
+                        "type": "file",
+                        "description": "Image Upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
                         "description": "Request payload",
                         "name": "Body",
                         "in": "body",
@@ -178,27 +192,33 @@ const docTemplate_swagger = `{
             "properties": {
                 "birthday": {
                     "description": "Date of birth of the tiger. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2005-12-30"
                 },
                 "image": {
-                    "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "description": "path to uploaded image.",
+                    "type": "string",
+                    "example": "path/to/image"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2019-08-01"
                 },
                 "latitude": {
                     "description": "Last seen Latitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 120.51687
                 },
                 "longitude": {
                     "description": "Last seen Longitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 50.894914
                 },
                 "name": {
                     "description": "Name of the tiger",
-                    "type": "string"
+                    "type": "string",
+                    "example": "tiger08"
                 }
             }
         },
@@ -206,24 +226,29 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "image": {
-                    "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "description": "path to uploaded image.",
+                    "type": "string",
+                    "example": "path/to/image"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2019-08-01"
                 },
                 "latitude": {
                     "description": "Last seen Latitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 120.51687
                 },
                 "longitude": {
                     "description": "Last seen Longitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 50.894914
                 },
                 "tiger_id": {
                     "description": "id of the tiger",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 7
                 }
             }
         },
@@ -242,7 +267,8 @@ const docTemplate_swagger = `{
                         },
                         "total_results": {
                             "description": "totals number of results found for the given query",
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 20
                         }
                     }
                 },
@@ -252,11 +278,13 @@ const docTemplate_swagger = `{
                     "properties": {
                         "error": {
                             "description": "Whether the current response processed successfully",
-                            "type": "boolean"
+                            "type": "boolean",
+                            "example": true
                         },
                         "message": {
                             "description": "Error message incase of any error.",
-                            "type": "string"
+                            "type": "string",
+                            "example": "some error information"
                         }
                     }
                 }
@@ -277,7 +305,8 @@ const docTemplate_swagger = `{
                         },
                         "total_results": {
                             "description": "totals number of results found for the given query",
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 20
                         }
                     }
                 },
@@ -287,11 +316,13 @@ const docTemplate_swagger = `{
                     "properties": {
                         "error": {
                             "description": "Whether the current response processed successfully",
-                            "type": "boolean"
+                            "type": "boolean",
+                            "example": true
                         },
                         "message": {
                             "description": "Error message incase of any error.",
-                            "type": "string"
+                            "type": "string",
+                            "example": "some error information"
                         }
                     }
                 }
@@ -306,11 +337,13 @@ const docTemplate_swagger = `{
                     "properties": {
                         "sighting_id": {
                             "description": "primay key for sighting",
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 12
                         },
                         "tiger_id": {
                             "description": "id of the tiger",
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 7
                         }
                     }
                 },
@@ -320,11 +353,13 @@ const docTemplate_swagger = `{
                     "properties": {
                         "error": {
                             "description": "Whether the current response processed successfully",
-                            "type": "boolean"
+                            "type": "boolean",
+                            "example": true
                         },
                         "message": {
                             "description": "Error message incase of any error.",
-                            "type": "string"
+                            "type": "string",
+                            "example": "some error information"
                         }
                     }
                 }
@@ -335,35 +370,43 @@ const docTemplate_swagger = `{
             "properties": {
                 "birthday": {
                     "description": "Date of birth of the tiger. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2005-12-30"
                 },
                 "image": {
-                    "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "description": "path to uploaded image.",
+                    "type": "string",
+                    "example": "path/to/image"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2019-08-01"
                 },
                 "latitude": {
                     "description": "Last seen Latitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 120.51687
                 },
                 "longitude": {
                     "description": "Last seen Longitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 50.894914
                 },
                 "name": {
                     "description": "Name of the tiger",
-                    "type": "string"
+                    "type": "string",
+                    "example": "tiger08"
                 },
                 "sighting_id": {
                     "description": "primay key for sighting",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 12
                 },
                 "tiger_id": {
                     "description": "id of the tiger",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 7
                 }
             }
         },
@@ -371,20 +414,24 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "image": {
-                    "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "description": "path to uploaded image.",
+                    "type": "string",
+                    "example": "path/to/image"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2019-08-01"
                 },
                 "latitude": {
                     "description": "Last seen Latitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 120.51687
                 },
                 "longitude": {
                     "description": "Last seen Longitude point",
-                    "type": "number"
+                    "type": "number",
+                    "example": 50.894914
                 }
             }
         },
@@ -393,7 +440,8 @@ const docTemplate_swagger = `{
             "properties": {
                 "tiger_id": {
                     "description": "id of the tiger",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 7
                 }
             }
         }

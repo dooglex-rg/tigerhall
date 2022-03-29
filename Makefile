@@ -4,9 +4,9 @@ setup:
 	cd golang && go mod tidy
 
 app:
-	cd golang && go build -o ./bin/app ./app/ 
-	./golang/bin/app
+	cd golang/app && go build -o appx . 
+	./golang/app/appx
 
 consumer:
-	cd golang && go build -o ./bin/tasks ./tasks/
-	./golang/bin/tasks
+	cd golang && go build -o tasksx .
+	./golang/tasks/tasksx

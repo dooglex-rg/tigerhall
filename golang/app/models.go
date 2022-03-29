@@ -7,30 +7,30 @@ type ErrorStatus struct {
 	//status of the error occurence in the current response
 	Status struct {
 		//Whether the current response processed successfully
-		Error bool `json:"error"`
+		Error bool `json:"error" example:"true"`
 		//Error message incase of any error.
-		Message string `json:"message"`
+		Message string `json:"message" example:"some error information"`
 	} `json:"status"`
 }
 
 //Bio of the tiger
 type PayloadTigerBio struct {
 	//Name of the tiger
-	Name string `json:"name" form:"name"`
+	Name string `json:"name" form:"name" example:"tiger08"`
 	//Date of birth of the tiger. Must be in YYYY-MM-DD format.
-	Dob string `json:"birthday" form:"birthday"`
+	Dob string `json:"birthday" form:"birthday" example:"2005-12-30"`
 }
 
 //fields for sighting
 type SightingInfo struct {
 	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
-	LastSeen string `json:"last_seen" form:"last_seen"`
+	LastSeen string `json:"last_seen" form:"last_seen" example:"2019-08-01"`
 	//Last seen Latitude point
-	Latitude float64 `json:"latitude" form:"latitude"`
+	Latitude float64 `json:"latitude" form:"latitude" example:"120.51687"`
 	//Last seen Longitude point
-	Longitude float64 `json:"longitude" form:"longitude"`
-	//Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.
-	Image string `json:"image" form:"image"`
+	Longitude float64 `json:"longitude" form:"longitude" example:"50.894914"`
+	//path to uploaded image.
+	Image string `json:"image" form:"image" example:"path/to/image"`
 }
 
 //Parsing Request payload to add a new tiger
@@ -48,13 +48,13 @@ type PayloadAddSighting struct {
 //id of the the Tiger
 type TigerIdModel struct {
 	//id of the tiger
-	TigerId int64 `json:"tiger_id" form:"tiger_id"`
+	TigerId int64 `json:"tiger_id" form:"tiger_id" example:"7"`
 }
 
 //sighting id field
 type SightingIdModel struct {
 	//primay key for sighting
-	SightingId int64 `json:"sighting_id" form:"sighting_id"`
+	SightingId int64 `json:"sighting_id" form:"sighting_id" example:"12"`
 }
 
 //Outgoing Response format for adding a new tiger
@@ -78,7 +78,7 @@ type ShowTigerModel struct {
 //totals results found response model
 type TotalResultsModel struct {
 	//totals number of results found for the given query
-	Count int `json:"total_results"`
+	Count int `json:"total_results" example:"20"`
 }
 
 //Outgoing Response format for show tigers

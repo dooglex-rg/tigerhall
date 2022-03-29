@@ -4,43 +4,52 @@ definitions:
     properties:
       birthday:
         description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
+        example: "2005-12-30"
         type: string
       image:
-        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
-          format.
+        description: path to uploaded image.
+        example: path/to/image
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
           format.
+        example: "2019-08-01"
         type: string
       latitude:
         description: Last seen Latitude point
+        example: 120.51687
         type: number
       longitude:
         description: Last seen Longitude point
+        example: 50.894914
         type: number
       name:
         description: Name of the tiger
+        example: tiger08
         type: string
     type: object
   main.PayloadAddSighting:
     properties:
       image:
-        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
-          format.
+        description: path to uploaded image.
+        example: path/to/image
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
           format.
+        example: "2019-08-01"
         type: string
       latitude:
         description: Last seen Latitude point
+        example: 120.51687
         type: number
       longitude:
         description: Last seen Longitude point
+        example: 50.894914
         type: number
       tiger_id:
         description: id of the tiger
+        example: 7
         type: integer
     type: object
   main.ResponseShowSighting:
@@ -54,6 +63,7 @@ definitions:
             type: array
           total_results:
             description: totals number of results found for the given query
+            example: 20
             type: integer
         type: object
       status:
@@ -61,9 +71,11 @@ definitions:
         properties:
           error:
             description: Whether the current response processed successfully
+            example: true
             type: boolean
           message:
             description: Error message incase of any error.
+            example: some error information
             type: string
         type: object
     type: object
@@ -78,6 +90,7 @@ definitions:
             type: array
           total_results:
             description: totals number of results found for the given query
+            example: 20
             type: integer
         type: object
       status:
@@ -85,9 +98,11 @@ definitions:
         properties:
           error:
             description: Whether the current response processed successfully
+            example: true
             type: boolean
           message:
             description: Error message incase of any error.
+            example: some error information
             type: string
         type: object
     type: object
@@ -98,9 +113,11 @@ definitions:
         properties:
           sighting_id:
             description: primay key for sighting
+            example: 12
             type: integer
           tiger_id:
             description: id of the tiger
+            example: 7
             type: integer
         type: object
       status:
@@ -108,9 +125,11 @@ definitions:
         properties:
           error:
             description: Whether the current response processed successfully
+            example: true
             type: boolean
           message:
             description: Error message incase of any error.
+            example: some error information
             type: string
         type: object
     type: object
@@ -118,52 +137,63 @@ definitions:
     properties:
       birthday:
         description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
+        example: "2005-12-30"
         type: string
       image:
-        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
-          format.
+        description: path to uploaded image.
+        example: path/to/image
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
           format.
+        example: "2019-08-01"
         type: string
       latitude:
         description: Last seen Latitude point
+        example: 120.51687
         type: number
       longitude:
         description: Last seen Longitude point
+        example: 50.894914
         type: number
       name:
         description: Name of the tiger
+        example: tiger08
         type: string
       sighting_id:
         description: primay key for sighting
+        example: 12
         type: integer
       tiger_id:
         description: id of the tiger
+        example: 7
         type: integer
     type: object
   main.SightingInfo:
     properties:
       image:
-        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
-          format.
+        description: path to uploaded image.
+        example: path/to/image
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
           format.
+        example: "2019-08-01"
         type: string
       latitude:
         description: Last seen Latitude point
+        example: 120.51687
         type: number
       longitude:
         description: Last seen Longitude point
+        example: 50.894914
         type: number
     type: object
   main.TigerIdModel:
     properties:
       tiger_id:
         description: id of the tiger
+        example: 7
         type: integer
     type: object
 host: tigerhall.dooglex.com
@@ -187,6 +217,11 @@ paths:
       description: Create a new sighting of existing tiger
       operationId: create_sighting
       parameters:
+      - description: Image Upload
+        in: formData
+        name: image
+        required: true
+        type: file
       - description: Request payload
         in: body
         name: Body
@@ -239,6 +274,11 @@ paths:
       description: Create a new tiger along with the last seen info
       operationId: create_tiger
       parameters:
+      - description: Image Upload
+        in: formData
+        name: image
+        required: true
+        type: file
       - description: Request payload
         in: body
         name: Body

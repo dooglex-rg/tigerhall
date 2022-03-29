@@ -21,6 +21,7 @@ func index_page(c *fiber.Ctx) error {
 // @ID create_tiger
 // @Accept  json,mpfd
 // @Produce  json
+// @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddNewTiger true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /tiger/add [post]
@@ -139,6 +140,7 @@ func show_tigers(c *fiber.Ctx) error {
 // @ID create_sighting
 // @Accept  json,mpfd
 // @Produce  json
+// @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddSighting true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /sighting/add [post]

@@ -18,6 +18,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 
+	_ "github.com/dooglex-rg/tigerhall/app/docs"
 	_ "github.com/lib/pq"
 )
 
@@ -97,9 +98,9 @@ func url_router(app *fiber.App) {
 	app.Post("/sighting/add", create_sighting)
 	app.Post("/sighting/show", show_sighting)
 
-	app.Get("/docs/*", swagger.New(swagger.Config{
-		Title:                    "Tigerhall - Swagger API docs",
-		URL:                      "/docs/doc.json",
+	app.Get("/api-docs/*", swagger.New(swagger.Config{
+		Title:                    "Swagger API docs",
+		URL:                      "/api-docs/doc.json",
 		DefaultModelsExpandDepth: -1,
 		Layout:                   "StandaloneLayout",
 		Plugins: []template.JS{
@@ -129,7 +130,7 @@ func middleware_config(app *fiber.App) {
 
 	//CORS configuration
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: fmt.Sprintf("%s:%s, %s",
+		AllowOrigins: fmt.Sprintf("http://%s:%s, https://%s",
 			os.Getenv("APP_HOST"), os.Getenv("APP_PORT"), os.Getenv("PUBLIC_HOST")),
 	}))
 }
