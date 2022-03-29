@@ -211,6 +211,8 @@ info:
 paths:
   /sighting/add:
     post:
+      consumes:
+      - multipart/form-data
       description: Create a new sighting of existing tiger
       operationId: create_sighting
       parameters:
@@ -237,6 +239,8 @@ paths:
       - Tiger
   /sighting/show:
     post:
+      consumes:
+      - multipart/form-data
       description: show the list of sightings of tigers
       operationId: show_sighting
       parameters:
@@ -262,6 +266,8 @@ paths:
       - Tiger
   /tiger/add:
     post:
+      consumes:
+      - multipart/form-data
       description: Create a new tiger along with the last seen info
       operationId: create_tiger
       parameters:
@@ -288,6 +294,8 @@ paths:
       - Tiger
   /tiger/show:
     post:
+      consumes:
+      - multipart/form-data
       description: show the list of tigers sorted by last seen time
       operationId: show_tigers
       parameters:

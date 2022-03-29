@@ -27,6 +27,9 @@ const docTemplate_swagger = `{
         "/sighting/add": {
             "post": {
                 "description": "Create a new sighting of existing tiger",
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -66,6 +69,9 @@ const docTemplate_swagger = `{
         "/sighting/show": {
             "post": {
                 "description": "show the list of sightings of tigers",
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -104,6 +110,9 @@ const docTemplate_swagger = `{
         "/tiger/add": {
             "post": {
                 "description": "Create a new tiger along with the last seen info",
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -143,6 +152,9 @@ const docTemplate_swagger = `{
         "/tiger/show": {
             "post": {
                 "description": "show the list of tigers sorted by last seen time",
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],

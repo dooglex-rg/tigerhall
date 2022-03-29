@@ -19,6 +19,7 @@ func index_page(c *fiber.Ctx) error {
 // @Description Create a new tiger along with the last seen info
 // @Tags Tiger
 // @ID create_tiger
+// @Accept mpfd
 // @Produce  json
 // @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddNewTiger true "Request payload"
@@ -30,7 +31,6 @@ func create_tiger(c *fiber.Ctx) error {
 
 	var p PayloadAddNewTiger
 
-	c.BodyParser(&p)
 	//Validating the payload fields
 	if p.Name == "" || p.Dob == "" || p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0 {
 		r.Status.Message = "name/birthday/last_seen/geo fields should not be blank/zero/nil value"
@@ -71,6 +71,7 @@ func create_tiger(c *fiber.Ctx) error {
 // @Description show the list of tigers sorted by last seen time
 // @Tags Tiger
 // @ID show_tigers
+// @Accept mpfd
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Success 200 {object} ResponseShowTigers
@@ -134,6 +135,7 @@ func show_tigers(c *fiber.Ctx) error {
 // @Description Create a new sighting of existing tiger
 // @Tags Tiger
 // @ID create_sighting
+// @Accept mpfd
 // @Produce  json
 // @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddSighting true "Request payload"
@@ -194,6 +196,7 @@ func create_sighting(c *fiber.Ctx) error {
 // @Description show the list of sightings of tigers
 // @Tags Tiger
 // @ID show_sighting
+// @Accept mpfd
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
 // @Param Body body TigerIdModel true "Request payload"
