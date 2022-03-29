@@ -1,0 +1,280 @@
+basePath: /
+definitions:
+  main.PayloadAddNewTiger:
+    properties:
+      birthday:
+        description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
+        type: string
+      image:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      last_seen:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      latitude:
+        description: Last seen Latitude point
+        type: number
+      longitude:
+        description: Last seen Longitude point
+        type: number
+      name:
+        description: Name of the tiger
+        type: string
+    type: object
+  main.PayloadAddSighting:
+    properties:
+      image:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      last_seen:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      latitude:
+        description: Last seen Latitude point
+        type: number
+      longitude:
+        description: Last seen Longitude point
+        type: number
+      tiger_id:
+        description: id of the tiger
+        type: integer
+    type: object
+  main.ResponseShowSighting:
+    properties:
+      data:
+        description: Data field
+        properties:
+          sighting_data:
+            items:
+              $ref: '#/definitions/main.SightingInfo'
+            type: array
+          total_results:
+            description: totals number of results found for the given query
+            type: integer
+        type: object
+      status:
+        description: status of the error occurence in the current response
+        properties:
+          error:
+            description: Whether the current response processed successfully
+            type: boolean
+          message:
+            description: Error message incase of any error.
+            type: string
+        type: object
+    type: object
+  main.ResponseShowTigers:
+    properties:
+      data:
+        description: Data field
+        properties:
+          tiger_data:
+            items:
+              $ref: '#/definitions/main.ShowTigerModel'
+            type: array
+          total_results:
+            description: totals number of results found for the given query
+            type: integer
+        type: object
+      status:
+        description: status of the error occurence in the current response
+        properties:
+          error:
+            description: Whether the current response processed successfully
+            type: boolean
+          message:
+            description: Error message incase of any error.
+            type: string
+        type: object
+    type: object
+  main.ResponseTiger:
+    properties:
+      data:
+        description: Data field
+        properties:
+          sighting_id:
+            description: primay key for sighting
+            type: integer
+          tiger_id:
+            description: id of the tiger
+            type: integer
+        type: object
+      status:
+        description: status of the error occurence in the current response
+        properties:
+          error:
+            description: Whether the current response processed successfully
+            type: boolean
+          message:
+            description: Error message incase of any error.
+            type: string
+        type: object
+    type: object
+  main.ShowTigerModel:
+    properties:
+      birthday:
+        description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
+        type: string
+      image:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      last_seen:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      latitude:
+        description: Last seen Latitude point
+        type: number
+      longitude:
+        description: Last seen Longitude point
+        type: number
+      name:
+        description: Name of the tiger
+        type: string
+      sighting_id:
+        description: primay key for sighting
+        type: integer
+      tiger_id:
+        description: id of the tiger
+        type: integer
+    type: object
+  main.SightingInfo:
+    properties:
+      image:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      last_seen:
+        description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
+          format.
+        type: string
+      latitude:
+        description: Last seen Latitude point
+        type: number
+      longitude:
+        description: Last seen Longitude point
+        type: number
+    type: object
+  main.TigerIdModel:
+    properties:
+      tiger_id:
+        description: id of the tiger
+        type: integer
+    type: object
+host: tigerhall.dooglex.com
+info:
+  contact:
+    email: rg@dooglex.com
+    name: Tech Support
+  description: This is an swagger documentation of simple test API task given by tigerhall
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://www.example.com/terms
+  title: Tigerhall test API
+  version: "1.0"
+paths:
+  /sighting/add:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Create a new sighting of existing tiger
+      operationId: create_sighting
+      parameters:
+      - description: Request payload
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/main.PayloadAddSighting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ResponseTiger'
+      summary: Create a new sighting of existing tiger
+      tags:
+      - Tiger
+  /sighting/show:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: show the list of sightings of tigers
+      operationId: show_sighting
+      parameters:
+      - description: 'Page number. Default: 1'
+        in: query
+        name: page
+        type: string
+      - description: Request payload
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/main.TigerIdModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ResponseShowSighting'
+      summary: show the list of sightings of tigers
+      tags:
+      - Tiger
+  /tiger/add:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Create a new tiger along with the last seen info
+      operationId: create_tiger
+      parameters:
+      - description: Request payload
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/main.PayloadAddNewTiger'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ResponseTiger'
+      summary: Create a new tiger along with the last seen info
+      tags:
+      - Tiger
+  /tiger/show:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: show the list of tigers sorted by last seen time
+      operationId: show_tigers
+      parameters:
+      - description: 'Page number. Default: 1'
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ResponseShowTigers'
+      summary: show the list of tigers sorted by last seen time
+      tags:
+      - Tiger
+swagger: "2.0"

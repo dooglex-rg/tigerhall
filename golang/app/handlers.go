@@ -21,7 +21,7 @@ func index_page(c *fiber.Ctx) error {
 // @ID create_tiger
 // @Accept  json,mpfd
 // @Produce  json
-// @Param Body body PayloadAddNewTiger true
+// @Param Body body PayloadAddNewTiger true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /tiger/add [post]
 func create_tiger(c *fiber.Ctx) error {
@@ -139,7 +139,7 @@ func show_tigers(c *fiber.Ctx) error {
 // @ID create_sighting
 // @Accept  json,mpfd
 // @Produce  json
-// @Param Body body PayloadAddSighting true
+// @Param Body body PayloadAddSighting true "Request payload"
 // @Success 200 {object} ResponseTiger
 // @Router /sighting/add [post]
 func create_sighting(c *fiber.Ctx) error {
@@ -200,7 +200,7 @@ func create_sighting(c *fiber.Ctx) error {
 // @Accept  json,mpfd
 // @Produce  json
 // @Param page query string false "Page number. Default: 1"
-// @Param Body body TigerIdModel true
+// @Param Body body TigerIdModel true "Request payload"
 // @Success 200 {object} ResponseShowSighting
 // @Router /sighting/show [post]
 func show_sighting(c *fiber.Ctx) error {

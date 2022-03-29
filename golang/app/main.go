@@ -101,7 +101,7 @@ func middleware_config(app *fiber.App) {
 
 	//CORS configuration
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:40619",
+		AllowOrigins: os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT"),
 	}))
 }
 
