@@ -44,13 +44,13 @@ func create_tiger(c *fiber.Ctx) error {
 
 	sql_code := `WITH rows AS ( 
 		INSERT INTO tiger_bio(name,dob) 
-		VALUES( ?, ?) 
+		VALUES( $1, $2) 
 		RETURNING id
 	)
 
 	INSERT INTO 
 	sighting_info(seen_time,latitude,longitude,image,tiger_id) 
-		VALUES( ?, ?, ?, ?, (SELECT id FROM rows) )
+		VALUES( $3, $4, $5, $6, (SELECT id FROM rows) )
 	RETURNING tiger_id, id;`
 
 	//save uploaded image to storage
@@ -106,7 +106,7 @@ func show_tigers(c *fiber.Ctx) error {
 	)
 	ORDER BY si.seen_time DESC
 	LIMIT 10
-	OFFSET ?;`
+	OFFSET $1;`
 
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)
@@ -169,7 +169,7 @@ func create_sighting(c *fiber.Ctx) error {
 
 	sql_code := `INSERT INTO 
 	sighting_info(seen_time,latitude,longitude,image,tiger_id) 
-	VALUES( ?, ?, ?, ?, ? )
+	VALUES( $1, $2, $3, $4, $5 )
 	RETURNING id;`
 
 	//save image to storage
@@ -221,9 +221,9 @@ func show_sighting(c *fiber.Ctx) error {
 		count(si.id) OVER() AS full_count
 	FROM sighting_info si
 
-	WHERE si.tiger_id = ?
+	WHERE si.tiger_id = $1
 	LIMIT 10
-	OFFSET ?;`
+	OFFSET $2;`
 
 	stmt, err := DB.Prepare(sql_code)
 	CheckError(err, nil)

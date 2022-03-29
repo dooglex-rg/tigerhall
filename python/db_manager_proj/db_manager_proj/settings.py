@@ -1,9 +1,11 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, "..","..",".env"))
 
 SECRET_KEY = 'c^z+a@#25hwp*tos+#oe^$c)9$q!!)*wg0$82!n=orc&@o_ql_'
 
@@ -17,8 +19,12 @@ MIDDLEWARE = []
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, "..","..","sqlite.db"),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASS"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
     }
 }
 

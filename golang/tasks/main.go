@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -16,7 +17,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/nfnt/resize"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 //database instance
@@ -28,14 +29,23 @@ func main() {
 
 	//Creating DB connection
 	var err error
-	DB, err = sql.Open("sqlite3", "./sqlite.db")
+	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME"),
+	)
+
+	//Creating DB connection
+	DB, err = sql.Open("postgres", DSN)
 	CheckError(err, nil)
 
 	defer DB.Close()
 
 	DB.SetConnMaxLifetime(time.Minute * 5)
-	DB.SetMaxOpenConns(2)
-	DB.SetMaxIdleConns(2)
+	DB.SetMaxOpenConns(10)
+	DB.SetMaxIdleConns(10)
 
 	//Ping test to db
 	CheckError(DB.Ping(), nil)
@@ -109,8 +119,8 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 
 	sql_code := `
 	UPDATE sighting_info 
-	SET image = ?
-	WHERE id = ?;`
+	SET image = $1
+	WHERE id = $2;`
 	//updates resized file path to DB
 	DB.Exec(sql_code, output_path, i["id"])
 	return nil

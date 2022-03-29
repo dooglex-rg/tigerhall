@@ -19,7 +19,7 @@ import (
 	"github.com/joho/godotenv"
 
 	_ "github.com/dooglex-rg/tigerhall/app/docs"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 //database instance
@@ -43,8 +43,16 @@ func main() {
 	err := godotenv.Load(".env")
 	CheckError(err, nil)
 
+	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME"),
+	)
+
 	//Creating DB connection
-	DB, err = sql.Open("sqlite3", "./sqlite.db")
+	DB, err = sql.Open("postgres", DSN)
 	CheckError(err, nil)
 
 	defer DB.Close()
@@ -52,8 +60,6 @@ func main() {
 	//Ping test to db
 	CheckError(DB.Ping(), nil)
 
-	//Based on free tier limit
-	//https://www.elephantsql.com/plans.html
 	DB.SetConnMaxLifetime(time.Minute * 1)
 	DB.SetMaxOpenConns(2)
 	DB.SetMaxIdleConns(2)
