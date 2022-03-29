@@ -109,8 +109,8 @@ func process_image_resize(c context.Context, t *asynq.Task) error {
 
 	sql_code := `
 	UPDATE sighting_info 
-	SET image = $1
-	WHERE id = $2;`
+	SET image = ?
+	WHERE id = ?;`
 	//updates resized file path to DB
 	DB.Exec(sql_code, output_path, i["id"])
 	return nil
