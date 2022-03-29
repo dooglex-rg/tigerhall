@@ -1,6 +1,6 @@
 setup:
-	python ./python/db_manager_proj/manage.py makemigrations
-	python ./python/db_manager_proj/manage.py migrate
+	python3 ./python/db_manager_proj/manage.py makemigrations
+	python3 ./python/db_manager_proj/manage.py migrate
 	cd golang && go mod tidy
 
 app:
