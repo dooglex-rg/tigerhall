@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
@@ -94,6 +96,32 @@ func url_router(app *fiber.App) {
 
 	app.Post("/sighting/add", create_sighting)
 	app.Post("/sighting/show", show_sighting)
+
+	app.Get("/docs/*", swagger.New(swagger.Config{
+		Title:                    "Tigerhall - Swagger API docs",
+		URL:                      "/docs/doc.json",
+		DefaultModelsExpandDepth: -1,
+		Layout:                   "StandaloneLayout",
+		Plugins: []template.JS{
+			template.JS("SwaggerUIBundle.plugins.DownloadUrl"),
+		},
+		Presets: []template.JS{
+			template.JS("SwaggerUIBundle.presets.apis"),
+			template.JS("SwaggerUIStandalonePreset"),
+		},
+		DeepLinking:             true,
+		DefaultModelExpandDepth: 1,
+		DefaultModelRendering:   "example",
+		DocExpansion:            "list",
+		SyntaxHighlight: swagger.SyntaxHighlightConfig{
+			Activate: true,
+			Theme:    "agate",
+		},
+		ShowMutatedRequest:   true,
+		ShowExtensions:       true,
+		ShowCommonExtensions: true,
+	}))
+
 }
 
 //Middlewares configuration
@@ -101,7 +129,8 @@ func middleware_config(app *fiber.App) {
 
 	//CORS configuration
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: os.Getenv("APP_HOST") + ":" + os.Getenv("APP_PORT"),
+		AllowOrigins: fmt.Sprintf("%s:%s, %s",
+			os.Getenv("APP_HOST"), os.Getenv("APP_PORT"), os.Getenv("PUBLIC_HOST")),
 	}))
 }
 
