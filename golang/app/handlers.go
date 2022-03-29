@@ -19,7 +19,7 @@ func index_page(c *fiber.Ctx) error {
 // @Description Create a new tiger along with the last seen info
 // @Tags Tiger
 // @ID create_tiger
-// @Accept  json,mpfd
+// @Accept  json,mpfd,x-www-form-urlencoded
 // @Produce  json
 // @Param image formData file true  "Image Upload"
 // @Param Body body PayloadAddNewTiger true "Request payload"
