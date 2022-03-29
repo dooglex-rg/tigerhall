@@ -28,7 +28,7 @@ const docTemplate_swagger = `{
             "post": {
                 "description": "Create a new sighting of existing tiger",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -39,13 +39,6 @@ const docTemplate_swagger = `{
                 "summary": "Create a new sighting of existing tiger",
                 "operationId": "create_sighting",
                 "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Image Upload",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
-                    },
                     {
                         "description": "Request payload",
                         "name": "Body",
@@ -70,7 +63,7 @@ const docTemplate_swagger = `{
             "post": {
                 "description": "show the list of sightings of tigers",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -111,7 +104,7 @@ const docTemplate_swagger = `{
             "post": {
                 "description": "Create a new tiger along with the last seen info",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -122,13 +115,6 @@ const docTemplate_swagger = `{
                 "summary": "Create a new tiger along with the last seen info",
                 "operationId": "create_tiger",
                 "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Image Upload",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
-                    },
                     {
                         "description": "Request payload",
                         "name": "Body",
@@ -153,7 +139,7 @@ const docTemplate_swagger = `{
             "post": {
                 "description": "show the list of tigers sorted by last seen time",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -180,9 +166,52 @@ const docTemplate_swagger = `{
                     }
                 }
             }
+        },
+        "/upload/image": {
+            "post": {
+                "description": "image upload endpoint",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tiger"
+                ],
+                "summary": "image upload endpoint",
+                "operationId": "handle_upload",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Image Upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ImageId"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "main.ImageId": {
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "description": "path to uploaded image.",
+                    "type": "string",
+                    "example": "generatedimageuuid"
+                }
+            }
+        },
         "main.PayloadAddNewTiger": {
             "type": "object",
             "properties": {
@@ -191,10 +220,10 @@ const docTemplate_swagger = `{
                     "type": "string",
                     "example": "2005-12-30"
                 },
-                "image": {
+                "image_id": {
                     "description": "path to uploaded image.",
                     "type": "string",
-                    "example": "path/to/image"
+                    "example": "generatedimageuuid"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
@@ -221,10 +250,10 @@ const docTemplate_swagger = `{
         "main.PayloadAddSighting": {
             "type": "object",
             "properties": {
-                "image": {
+                "image_id": {
                     "description": "path to uploaded image.",
                     "type": "string",
-                    "example": "path/to/image"
+                    "example": "generatedimageuuid"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
@@ -369,10 +398,10 @@ const docTemplate_swagger = `{
                     "type": "string",
                     "example": "2005-12-30"
                 },
-                "image": {
+                "image_id": {
                     "description": "path to uploaded image.",
                     "type": "string",
-                    "example": "path/to/image"
+                    "example": "generatedimageuuid"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",
@@ -409,10 +438,10 @@ const docTemplate_swagger = `{
         "main.SightingInfo": {
             "type": "object",
             "properties": {
-                "image": {
+                "image_id": {
                     "description": "path to uploaded image.",
                     "type": "string",
-                    "example": "path/to/image"
+                    "example": "generatedimageuuid"
                 },
                 "last_seen": {
                     "description": "Timestamp when the tiger was last seen. Must be in YYYY-MM-DD format.",

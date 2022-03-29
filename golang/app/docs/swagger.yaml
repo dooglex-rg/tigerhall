@@ -1,14 +1,21 @@
 basePath: /
 definitions:
+  main.ImageId:
+    properties:
+      image_id:
+        description: path to uploaded image.
+        example: generatedimageuuid
+        type: string
+    type: object
   main.PayloadAddNewTiger:
     properties:
       birthday:
         description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
         example: "2005-12-30"
         type: string
-      image:
+      image_id:
         description: path to uploaded image.
-        example: path/to/image
+        example: generatedimageuuid
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
@@ -30,9 +37,9 @@ definitions:
     type: object
   main.PayloadAddSighting:
     properties:
-      image:
+      image_id:
         description: path to uploaded image.
-        example: path/to/image
+        example: generatedimageuuid
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
@@ -139,9 +146,9 @@ definitions:
         description: Date of birth of the tiger. Must be in YYYY-MM-DD format.
         example: "2005-12-30"
         type: string
-      image:
+      image_id:
         description: path to uploaded image.
-        example: path/to/image
+        example: generatedimageuuid
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
@@ -171,9 +178,9 @@ definitions:
     type: object
   main.SightingInfo:
     properties:
-      image:
+      image_id:
         description: path to uploaded image.
-        example: path/to/image
+        example: generatedimageuuid
         type: string
       last_seen:
         description: Timestamp when the tiger was last seen. Must be in YYYY-MM-DD
@@ -212,15 +219,10 @@ paths:
   /sighting/add:
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       description: Create a new sighting of existing tiger
       operationId: create_sighting
       parameters:
-      - description: Image Upload
-        in: formData
-        name: image
-        required: true
-        type: file
       - description: Request payload
         in: body
         name: Body
@@ -240,7 +242,7 @@ paths:
   /sighting/show:
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       description: show the list of sightings of tigers
       operationId: show_sighting
       parameters:
@@ -267,15 +269,10 @@ paths:
   /tiger/add:
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       description: Create a new tiger along with the last seen info
       operationId: create_tiger
       parameters:
-      - description: Image Upload
-        in: formData
-        name: image
-        required: true
-        type: file
       - description: Request payload
         in: body
         name: Body
@@ -295,7 +292,7 @@ paths:
   /tiger/show:
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       description: show the list of tigers sorted by last seen time
       operationId: show_tigers
       parameters:
@@ -311,6 +308,28 @@ paths:
           schema:
             $ref: '#/definitions/main.ResponseShowTigers'
       summary: show the list of tigers sorted by last seen time
+      tags:
+      - Tiger
+  /upload/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: image upload endpoint
+      operationId: handle_upload
+      parameters:
+      - description: Image Upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ImageId'
+      summary: image upload endpoint
       tags:
       - Tiger
 swagger: "2.0"
