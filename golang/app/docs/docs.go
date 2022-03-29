@@ -29,7 +29,8 @@ const docTemplate_swagger = `{
                 "description": "Create a new sighting of existing tiger",
                 "consumes": [
                     "application/json",
-                    "multipart/form-data"
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"

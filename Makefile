@@ -8,5 +8,5 @@ app:
 	./golang/app/appx
 
 consumer:
-	cd golang && go build -o tasksx .
+	cd golang/tasks && go build -o tasksx .
 	./golang/tasks/tasksx
