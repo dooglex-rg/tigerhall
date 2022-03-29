@@ -1,6 +1,10 @@
 from pathlib import Path
+import os
+
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 SECRET_KEY = 'c^z+a@#25hwp*tos+#oe^$c)9$q!!)*wg0$82!n=orc&@o_ql_'
 
 DEBUG = True
@@ -13,11 +17,8 @@ MIDDLEWARE = []
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': "nrkisatu",
-        'USER': 'nrkisatu',
-        'PASSWORD': 'rzrCj-txNNA1zJhC8xdGy6hmXvr7vlkG',
-        'HOST': 'kandula.db.elephantsql.com'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, "..","..","sqlite.db"),
     }
 }
 

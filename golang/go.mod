@@ -9,6 +9,7 @@ require (
 	github.com/hibiken/asynq v0.22.1
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.4
+	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/swaggo/swag v1.8.0
 )

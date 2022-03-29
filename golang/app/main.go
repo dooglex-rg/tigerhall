@@ -19,7 +19,7 @@ import (
 	"github.com/joho/godotenv"
 
 	_ "github.com/dooglex-rg/tigerhall/app/docs"
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 //database instance
@@ -43,16 +43,8 @@ func main() {
 	err := godotenv.Load(".env")
 	CheckError(err, nil)
 
-	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_NAME"),
-	)
-
 	//Creating DB connection
-	DB, err = sql.Open("postgres", DSN)
+	DB, err = sql.Open("sqlite3", "./sqlite.db")
 	CheckError(err, nil)
 
 	defer DB.Close()
