@@ -35,6 +35,7 @@ func create_tiger(c *fiber.Ctx) error {
 
 	var p PayloadAddNewTiger
 
+	c.BodyParser(&p)
 	//Validating the payload fields
 	if p.Name == "" || p.Dob == "" || p.LastSeen == "" || p.Latitude == 0 || p.Longitude == 0 {
 		r.Status.Message = "name/birthday/last_seen/geo fields should not be blank/zero/nil value"

@@ -102,6 +102,6 @@ type ResponseShowSighting struct {
 
 //id of the the Tiger
 type ImageId struct {
-	//path to uploaded image.
+	//Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
 	Image string `json:"image_id" form:"image_id" example:"generatedimageuuid"`
 }

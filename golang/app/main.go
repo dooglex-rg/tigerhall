@@ -94,6 +94,14 @@ func url_router(app *fiber.App) {
 
 	app.Post("/upload/image", save_tiger_image)
 
+	app.Static("/download/image/", os.Getenv("IMAGE_FOLDER"), fiber.Static{
+		Compress:      true,
+		ByteRange:     true,
+		Browse:        false,
+		CacheDuration: 10 * time.Minute,
+		MaxAge:        int(time.Minute) * 10,
+	})
+
 	app.Get("/api-docs/*", swagger.New(swagger.Config{
 		Title:                    "Swagger API docs",
 		URL:                      "/api-docs/doc.json",
