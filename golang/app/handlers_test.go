@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,6 +20,70 @@ type RoutingTestModel struct {
 	route         string
 	expectedError bool
 	expectedCode  int
+}
+
+var fiber_app *fiber.App
+
+func TestMain(m *testing.M) {
+	godotenv.Load(".env")
+	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME_MOCK"),
+	)
+
+	var err error
+	//Creating DB connection
+	DB, err = sql.Open("postgres", DSN)
+	CheckError(err, nil)
+	defer DB.Close()
+	CheckError(DB.Ping(), nil)
+	fiber_app = fiber.New()
+	url_router(fiber_app)
+}
+
+func BasicTestTemplate(t *testing.T, tests []RoutingTestModel, r interface{}) {
+
+	for _, test := range tests {
+		req_byte, _ := json.Marshal(r)
+
+		req, _ := http.NewRequest(
+			"POST",
+			test.route,
+			bytes.NewBuffer(req_byte),
+		)
+		req.Header.Set("Content-Type", "application/json")
+
+		res, err := fiber_app.Test(req, -1)
+
+		// verify that no error occured, that is not expected
+		assert.Equalf(t, test.expectedError, err != nil, test.description)
+
+		// As expected errors lead to broken responses, the next
+		// test case needs to be processed
+		if test.expectedError {
+			continue
+		}
+
+		// Verify if the status code is as expected
+		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
+
+		// Read the response body
+		body, err := ioutil.ReadAll(res.Body)
+
+		// Reading the response body should work everytime, such that
+		// the err variable should be nil
+		assert.Nilf(t, err, test.description)
+
+		var resp ErrorStatus
+		json.Unmarshal(body, &resp)
+
+		// Verify, that the reponse body equals the expected body
+		assert.Equalf(t, false, resp.Status.Error, test.description)
+	}
+
 }
 
 func TestCreate_tiger(t *testing.T) {
@@ -51,67 +116,4 @@ func TestCreate_tiger(t *testing.T) {
 	r.Image = "testuuid"
 
 	BasicTestTemplate(t, tests, r)
-}
-
-func connect_mock_db() {
-	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_NAME_MOCK"),
-	)
-
-	var err error
-	//Creating DB connection
-	DB, err = sql.Open("postgres", DSN)
-	CheckError(err, nil)
-	CheckError(DB.Ping(), nil)
-}
-
-func BasicTestTemplate(t *testing.T, tests []RoutingTestModel, r interface{}) {
-	connect_mock_db()
-	defer DB.Close()
-
-	app := fiber.New()
-	url_router(app)
-
-	for _, test := range tests {
-		req_byte, _ := json.Marshal(r)
-
-		req, _ := http.NewRequest(
-			"POST",
-			test.route,
-			bytes.NewBuffer(req_byte),
-		)
-		req.Header.Set("Content-Type", "application/json")
-
-		res, err := app.Test(req, -1)
-
-		// verify that no error occured, that is not expected
-		assert.Equalf(t, test.expectedError, err != nil, test.description)
-
-		// As expected errors lead to broken responses, the next
-		// test case needs to be processed
-		if test.expectedError {
-			continue
-		}
-
-		// Verify if the status code is as expected
-		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
-
-		// Read the response body
-		body, err := ioutil.ReadAll(res.Body)
-
-		// Reading the response body should work everytime, such that
-		// the err variable should be nil
-		assert.Nilf(t, err, test.description)
-
-		var resp ErrorStatus
-		json.Unmarshal(body, &resp)
-
-		// Verify, that the reponse body equals the expected body
-		assert.Equalf(t, false, resp.Status.Error, test.description)
-	}
-
 }
