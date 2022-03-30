@@ -4,6 +4,9 @@ setup:
 	python3 ./python/db_manager_proj/manage.py migrate
 	cd golang && go mod tidy
 
+mock_db:
+	python3 ./python/db_manager_proj/manage.py migrate --database=mock_db
+
 app:
 	cd golang/app && go build -o appx . 
 	./golang/app/appx
@@ -13,4 +16,4 @@ consumer:
 	./golang/tasks/tasksx
 
 test:
-	go test golang/app
+	cd golang/app && go test

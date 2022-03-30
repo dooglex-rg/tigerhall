@@ -25,9 +25,12 @@ DATABASES = {
         'PASSWORD': os.getenv("DB_PASS"),
         'HOST': os.getenv("DB_HOST"),
         'PORT': os.getenv("DB_PORT"),
-    }
+    },
 }
 
+#create mock database for unit testing 
+DATABASES["mock_db"] = DATABASES['default']
+DATABASES["mock_db"]['NAME'] = os.getenv("DB_NAME_MOCK")
 
 LANGUAGE_CODE = 'en-us'
 

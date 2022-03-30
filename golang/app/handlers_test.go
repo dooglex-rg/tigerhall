@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,6 +22,7 @@ type RoutingTestModel struct {
 }
 
 func TestCreate_tiger(t *testing.T) {
+
 	tests := []RoutingTestModel{
 		{
 			description:   "create new tiger",
@@ -49,7 +53,26 @@ func TestCreate_tiger(t *testing.T) {
 	BasicTestTemplate(t, tests, r)
 }
 
+func connect_mock_db() {
+	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASS"),
+		os.Getenv("DB_NAME_MOCK"),
+	)
+
+	var err error
+	//Creating DB connection
+	DB, err = sql.Open("postgres", DSN)
+	CheckError(err, nil)
+	CheckError(DB.Ping(), nil)
+}
+
 func BasicTestTemplate(t *testing.T, tests []RoutingTestModel, r interface{}) {
+	connect_mock_db()
+	defer DB.Close()
+
 	app := fiber.New()
 	url_router(app)
 
@@ -84,8 +107,11 @@ func BasicTestTemplate(t *testing.T, tests []RoutingTestModel, r interface{}) {
 		// the err variable should be nil
 		assert.Nilf(t, err, test.description)
 
+		var resp ErrorStatus
+		json.Unmarshal(body, &resp)
+
 		// Verify, that the reponse body equals the expected body
-		assert.Equalf(t, 1, len(body), test.description)
+		assert.Equalf(t, false, resp.Status.Error, test.description)
 	}
 
 }

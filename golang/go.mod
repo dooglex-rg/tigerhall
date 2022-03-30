@@ -3,6 +3,7 @@ module github.com/dooglex-rg/tigerhall
 go 1.17
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/arsmn/fiber-swagger/v2 v2.24.0
 	github.com/gofiber/fiber/v2 v2.30.0
 	github.com/google/uuid v1.2.0
