@@ -2,11 +2,8 @@ setup:
 	pip3 install python-dotenv --quiet
 	python3 ./python/db_manager_proj/manage.py makemigrations
 	python3 ./python/db_manager_proj/manage.py migrate
-	cd golang && go mod tidy
-
-mock_db:
 	python3 ./python/db_manager_proj/manage.py migrate --database=mock_db
-
+	cd golang && go mod tidy
 app:
 	cd golang/app && go build -o appx . 
 	./golang/app/appx
