@@ -11,3 +11,6 @@ app:
 consumer:
 	cd golang/tasks && go build -o tasksx .
 	./golang/tasks/tasksx
+
+test:
+	go test golang/app
