@@ -121,7 +121,7 @@ func TestCreateTiger(t *testing.T) {
 			description:   "non existing route",
 			route:         "/i-dont-exist",
 			expectedError: true,
-			expectedCode:  400,
+			expectedCode:  404,
 		},
 	}
 	payload := PayloadAddNewTiger{
@@ -173,7 +173,7 @@ func TestCreateSighting(t *testing.T) {
 			description:   "non existing route",
 			route:         "/i-dont-exist",
 			expectedError: true,
-			expectedCode:  400,
+			expectedCode:  404,
 		},
 	}
 	payload := PayloadAddSighting{
@@ -201,7 +201,7 @@ func TestShowSighting(t *testing.T) {
 			description:   "non existing route",
 			route:         "/i-dont-exist",
 			expectedError: true,
-			expectedCode:  400,
+			expectedCode:  404,
 		},
 	}
 	payload := TigerIdModel{TigerId: 1}
