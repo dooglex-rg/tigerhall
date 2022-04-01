@@ -265,10 +265,11 @@ func save_tiger_image(c *fiber.Ctx) error {
 	file_name := uuid.New().String() + file_extention
 	//file destination path
 	file_path := os.Getenv("IMAGE_FOLDER") + file_name
-	//scheduling for image resizing queue
-	schedule_image_resize(file_name, file_extention)
 
 	c.SaveFile(file_stream, file_path)
+
+	//scheduling for image resizing queue
+	schedule_image_resize(file_name, file_extention)
 
 	return c.JSON(ImageId{Image: file_name})
 }
