@@ -57,6 +57,8 @@ func TestMain(m *testing.M) {
 	CheckError(DB.Ping(), nil)
 	fiber_app = fiber.New()
 	url_router(fiber_app)
+
+	os.Exit(m.Run())
 }
 
 //common test pattern
@@ -118,7 +120,7 @@ func TestCreateTiger(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: false,
+			expectedError: true,
 			expectedCode:  400,
 		},
 	}
@@ -150,7 +152,7 @@ func TestShowTigers(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: false,
+			expectedError: true,
 			expectedCode:  404,
 		},
 	}
@@ -170,7 +172,7 @@ func TestCreateSighting(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: false,
+			expectedError: true,
 			expectedCode:  400,
 		},
 	}
@@ -198,7 +200,7 @@ func TestShowSighting(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: false,
+			expectedError: true,
 			expectedCode:  400,
 		},
 	}
