@@ -13,4 +13,4 @@ consumer:
 	./golang/tasks/tasksx
 
 test:
-	cd golang/app && go test
+	cd golang/app && go test -v

@@ -21,7 +21,7 @@ type RoutingTestModel struct {
 	description string
 	//url path
 	route string
-	//is error expected?
+	//error expectation
 	expectedError bool
 	//http status code
 	expectedCode int
@@ -120,7 +120,7 @@ func TestCreateTiger(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: true,
+			expectedError: false,
 			expectedCode:  404,
 		},
 	}
@@ -152,7 +152,7 @@ func TestShowTigers(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: true,
+			expectedError: false,
 			expectedCode:  404,
 		},
 	}
@@ -172,7 +172,7 @@ func TestCreateSighting(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: true,
+			expectedError: false,
 			expectedCode:  404,
 		},
 	}
@@ -200,7 +200,7 @@ func TestShowSighting(t *testing.T) {
 		{
 			description:   "non existing route",
 			route:         "/i-dont-exist",
-			expectedError: true,
+			expectedError: false,
 			expectedCode:  404,
 		},
 	}
