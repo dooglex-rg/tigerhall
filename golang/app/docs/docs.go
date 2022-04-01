@@ -206,7 +206,7 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "image_id": {
-                    "description": "path to uploaded image.",
+                    "description": "Uploaded image id, which can be downloaded at endpoint \"/download/image/\u003cgeneratedimageuuid\u003e\"",
                     "type": "string",
                     "example": "generatedimageuuid"
                 }
@@ -221,7 +221,7 @@ const docTemplate_swagger = `{
                     "example": "2005-12-30"
                 },
                 "image_id": {
-                    "description": "path to uploaded image.",
+                    "description": "Uploaded image id, which can be downloaded at endpoint \"/download/image/\u003cgeneratedimageuuid\u003e\"",
                     "type": "string",
                     "example": "generatedimageuuid"
                 },
@@ -251,7 +251,7 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "image_id": {
-                    "description": "path to uploaded image.",
+                    "description": "Uploaded image id, which can be downloaded at endpoint \"/download/image/\u003cgeneratedimageuuid\u003e\"",
                     "type": "string",
                     "example": "generatedimageuuid"
                 },
@@ -399,7 +399,7 @@ const docTemplate_swagger = `{
                     "example": "2005-12-30"
                 },
                 "image_id": {
-                    "description": "path to uploaded image.",
+                    "description": "Uploaded image id, which can be downloaded at endpoint \"/download/image/\u003cgeneratedimageuuid\u003e\"",
                     "type": "string",
                     "example": "generatedimageuuid"
                 },
@@ -439,7 +439,7 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "image_id": {
-                    "description": "path to uploaded image.",
+                    "description": "Uploaded image id, which can be downloaded at endpoint \"/download/image/\u003cgeneratedimageuuid\u003e\"",
                     "type": "string",
                     "example": "generatedimageuuid"
                 },

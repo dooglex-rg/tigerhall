@@ -3,7 +3,7 @@ definitions:
   main.ImageId:
     properties:
       image_id:
-        description: path to uploaded image.
+        description: Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
         example: generatedimageuuid
         type: string
     type: object
@@ -14,7 +14,7 @@ definitions:
         example: "2005-12-30"
         type: string
       image_id:
-        description: path to uploaded image.
+        description: Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
         example: generatedimageuuid
         type: string
       last_seen:
@@ -38,7 +38,7 @@ definitions:
   main.PayloadAddSighting:
     properties:
       image_id:
-        description: path to uploaded image.
+        description: Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
         example: generatedimageuuid
         type: string
       last_seen:
@@ -147,7 +147,7 @@ definitions:
         example: "2005-12-30"
         type: string
       image_id:
-        description: path to uploaded image.
+        description: Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
         example: generatedimageuuid
         type: string
       last_seen:
@@ -179,7 +179,7 @@ definitions:
   main.SightingInfo:
     properties:
       image_id:
-        description: path to uploaded image.
+        description: Uploaded image id, which can be downloaded at endpoint "/download/image/<generatedimageuuid>"
         example: generatedimageuuid
         type: string
       last_seen:
