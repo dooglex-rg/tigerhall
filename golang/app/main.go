@@ -35,8 +35,14 @@ var client *asynq.Client
 // @host tigerhall.dooglex.com
 // @BasePath /
 func main() {
+
+	env_file := ".env"
+	if _, err := os.Stat(env_file); err != nil || !os.IsExist(err) {
+		env_file = "../../.env"
+	}
+
 	//load env variables from .env file
-	err := godotenv.Load(".env")
+	err := godotenv.Load(env_file)
 	CheckError(err, nil)
 
 	DSN := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
