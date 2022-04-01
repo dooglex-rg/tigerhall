@@ -10,22 +10,34 @@ Golang folder contains the main webapp which will be handling the incoming API r
 ## golang/images
 this is where user uploaded images are stored and resized later (by task queue)
 
+## API documentation
+The API is documented based on swagger standards. The documenation can be found in urlpath `/api-docs/`
+The deployed webapp/docs is available in [this url](https://tigerhall.dooglex.com/api-docs/)
+
 # how to run this project (makefile commands)
 
-## prequsites
+## prequsites/installation
 configure the .env file for your local settings
 
-## make setup
+```sh
+make setup
+```
 this command will setup/migrate the database schemas based on python/django models
 
-## make test
+```sh
+make test
+```
 runs go testing of our webapp
 
-## make app
+```sh
+make app
+```
 initiates the webapp
 
-## make consumer
+```sh
+make consumer
+```
 initiates the task queue for background processing of image resizing
 
 ## important note:
-Both "make app" and "make consumer" are persistant process. both need to be running parallell in order to run the task queue along with the webapp.
+Both `make app` and `make consumer` are persistant process. both need to be running parallell in order to run the task queue along with the webapp.
